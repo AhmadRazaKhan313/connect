@@ -12,10 +12,13 @@ invoiceService.createInvoice = async (InvoiceBody) => {
 
 /**
  * Get All Completed Invoices
+ * @param {ObjectId} organizationId
  * @returns {Promise<InvoiceModel>}
  */
-invoiceService.getAllInvoices = async () => {
-  return await InvoiceModel.find({}).populate("isp");
+invoiceService.getAllInvoices = async (organizationId) => {
+  const filter = {};
+  if (organizationId) filter.organizationId = organizationId;
+  return await InvoiceModel.find(filter).populate("isp");
 };
 
 /**
@@ -23,20 +26,23 @@ invoiceService.getAllInvoices = async () => {
  * @param {String} startDate
  * @param {String} endDate
  * @param {ObjectId} isp
+ * @param {ObjectId} organizationId
  * @returns {Promise<InvoiceModel>}
  */
-invoiceService.getSentInvoices = async (startDate, endDate, isp) => {
+invoiceService.getSentInvoices = async (startDate, endDate, isp, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
-  return await InvoiceModel.find({
+  const filter = {
     isp,
     date:
       endDate === "" || startDate === endDate
         ? new Date(startDate)
         : { $gte: new Date(startDate), $lte: new Date(endDate) },
-  }).populate("isp");
+  };
+  if (organizationId) filter.organizationId = organizationId;
+  return await InvoiceModel.find(filter).populate("isp");
 };
 
 /**

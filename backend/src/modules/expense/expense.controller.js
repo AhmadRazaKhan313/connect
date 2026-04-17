@@ -13,23 +13,25 @@ expenseController.createExpense = catchAsync(async (req, res) => {
     req.body.date.setUTCDate(req.body.date.getUTCDate() + 1);
     req.body.date.setUTCHours(0, 0, 0, 0);
   }
-  const admin = await staffService.getStaffsByType(STAFF_TYPES.admin);
+  const admin = await staffService.getStaffsByType(STAFF_TYPES.orgAdmin, req.organizationId);
   const file = req?.file;
   if (!admin || admin.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "Admin not found");
   } else {
     let newExpense = req?.body;
-    if (req?.user?.type !== STAFF_TYPES.admin && req?.body?.amount > 999) {
+    if (req?.user?.type !== STAFF_TYPES.orgAdmin && req?.body?.amount > 999) {
       newExpense = {
         ...newExpense,
         staff: req?.user?.id,
         status: "pending",
+        organizationId: req.organizationId,
       };
     } else {
       newExpense = {
         ...newExpense,
         staff: req?.user?.id,
         status: "completed",
+        organizationId: req.organizationId,
       };
     }
     const expense = await expenseService.createExpense(newExpense);
@@ -78,7 +80,12 @@ expenseController.createExpense = catchAsync(async (req, res) => {
 });
 
 expenseController.getAllExpenses = catchAsync(async (req, res) => {
-  const expenses = await expenseService.getAllExpenses();
+  const expenses = await expenseService.getAllExpenses(
+    req?.body?.startDate,
+    req?.body?.endDate,
+    req?.body?.spentBy,
+    req.organizationId
+  );
   if (!expenses || expenses.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Expenses Yet");
   }
@@ -89,7 +96,8 @@ expenseController.getCompletedExpenses = catchAsync(async (req, res) => {
   const expenses = await expenseService.getAllExpenses(
     req?.body?.startDate,
     req?.body?.endDate,
-    req?.body?.spentBy
+    req?.body?.spentBy,
+    req.organizationId
   );
   if (!expenses || expenses.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Completed Expenses Yet");
@@ -122,7 +130,8 @@ expenseController.getPendingExpenses = catchAsync(async (req, res) => {
   const allExpenses = await expenseService.getAllExpensesByStatus(
     req?.body?.startDate,
     req?.body?.endDate,
-    "pending"
+    "pending",
+    req.organizationId
   );
   if (!allExpenses || allExpenses.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Pending Expenses Yet");
@@ -189,16 +198,7 @@ expenseController.approveExpenseByAdmin = catchAsync(async (req, res) => {
       status: "completed",
     });
     if (Expense) {
-      // await sendEmailByInfo(
-      //   expense?.staff?.email,
-      //   "Expense Approved",
-      //   `<html><body><p>The expense you added was approved by Admin.
-      //   <br>Details: ${expense?.details}
-      //   <br>Amount: ${expense?.amount}
-      //   <br>Date: ${expense?.date}
-      //   <br>Payment Method: ${getPaymentMethodNameByKey(expense?.paymentMethod)}
-      //   <br>TID: ${expense?.tid}</p></body></html>`
-      // );
+      // await sendEmailByInfo(...)
       res.send("Expense Approved");
     } else {
       res.send("Something went wrong");
@@ -215,16 +215,7 @@ expenseController.declineExpenseByAdmin = catchAsync(async (req, res) => {
       status: "deleted",
     });
     if (Expense) {
-      // await sendEmailByInfo(
-      //   expense?.staff?.email,
-      //   "Expense Declined",
-      //   `<html><body><p>The expense you added was declined by Admin.
-      //   <br>Details: ${expense?.details}
-      //   <br>Amount: ${expense?.amount}
-      //   <br>Date: ${expense?.date}
-      //   <br>Payment Method: ${getPaymentMethodNameByKey(expense?.paymentMethod)}
-      //   <br>TID: ${expense?.tid}</p></body></html>`
-      // );
+      // await sendEmailByInfo(...)
       res.send("Expense Declined");
     } else {
       res.send("Expense not found");

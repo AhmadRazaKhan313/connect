@@ -13,6 +13,9 @@ const verifyCallback =
       try {
         req.user = user;
 
+        // organizationId request mein inject karo
+        req.organizationId = user.role === "platformSuperAdmin" ? null : user.organizationId;
+
         if (requiredRights.length) {
           const userRights = roleRights.get(user.role);
           const hasRequiredRights = requiredRights.every((requiredRight) =>

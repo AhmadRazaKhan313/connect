@@ -31,6 +31,11 @@ const UserSchema = mongoose.Schema(
       type: String,
       required: [true, "Address is required"],
     },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      default: null,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Staff",

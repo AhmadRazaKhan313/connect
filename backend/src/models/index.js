@@ -8,3 +8,4 @@ module.exports.InvoiceModel = require("../modules/invoice/invoice.model");
 module.exports.ExpenseModel = require("../modules/expense/expense.model");
 module.exports.SmsSendingModel = require("../modules/sms-sending/smsSending.model");
 module.exports.ExtraIncomeModel = require("../modules/extra-income/extra-income.model");
+module.exports.OrganizationModel = require("../modules/organization/organization.model");

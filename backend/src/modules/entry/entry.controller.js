@@ -54,7 +54,7 @@ entryController.createEntry = catchAsync(async (req, res) => {
       req.body.purchaseRate = +req?.body?.purchaseRate + +Isp?.staticIpRate;
     }
 
-    const entry = await entryService.createEntry(req.body);
+    const entry = await entryService.createEntry({ ...req.body, organizationId: req.organizationId });
     await ispService.updateIspById(Package?.isp?.id, {
       openingBalance: Package?.isp?.openingBalance - Package?.purchaseRate,
     });
@@ -69,7 +69,7 @@ entryController.createEntry = catchAsync(async (req, res) => {
       req?.body?.sendAlertMessage &&
       req?.body?.paymentMethod !== "pending"
     ) {
-      await sendTemplateForEntryPayment(isUser?.mobile, isUser?.fullname, isUser?.userId, Package?.isp?.vlan, tid, expiryDate)
+      await sendTemplateForEntryPayment(isUser?.mobile, isUser?.fullname, isUser?.userId, Package?.isp?.vlan, tid, expiryDate);
     }
     res.status(httpStatus.CREATED).send(entry);
   }
@@ -79,7 +79,8 @@ entryController.getAlCompletedlEntries = catchAsync(async (req, res) => {
   const allEntries = await entryService.getAlCompletedlEntries(
     req?.body?.startDate,
     req?.body?.endDate,
-    req?.body?.isp
+    req?.body?.isp,
+    req.organizationId
   );
   if (!allEntries || allEntries.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Completed Entries");
@@ -100,7 +101,7 @@ entryController.getAlCompletedlEntries = catchAsync(async (req, res) => {
 });
 
 entryController.getAlPendinglEntries = catchAsync(async (req, res) => {
-  const allEntries = await entryService.getAlPendinglEntries();
+  const allEntries = await entryService.getAlPendinglEntries(req.organizationId);
   if (!allEntries || allEntries.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Pending Entries");
   }
@@ -124,7 +125,8 @@ entryController.getAllPendingEntriesWithinDateRange = catchAsync(
 
     const allEntries = await entryService.getAllPendingEntriesWithinDateRange(
       dateFrom,
-      dateTo
+      dateTo,
+      req.organizationId
     );
     if (!allEntries || allEntries.length === 0) {
       throw new ApiError(httpStatus.NOT_FOUND, "No Pending Entries");
@@ -184,8 +186,7 @@ entryController.updateEntryById = catchAsync(async (req, res) => {
     if (req?.body?.ipType === "static") {
       const Isp = await ispService.getIspById(req.body?.isp);
       req.body.saleRate =
-        +req?.body?.saleRate
-        + +req?.body?.staticIpSaleRate;
+        +req?.body?.saleRate + +req?.body?.staticIpSaleRate;
       req.body.purchaseRate = +req?.body?.purchaseRate + +Isp?.staticIpRate;
     }
 
@@ -206,7 +207,7 @@ entryController.updateEntryById = catchAsync(async (req, res) => {
       req?.body?.sendAlertMessage &&
       req?.body?.paymentMethod !== "pending"
     ) {
-      await sendTemplateForEntryPayment(isUser?.mobile, isUser?.fullname, isUser?.userId, Package?.isp?.vlan, tid, expiryDate)
+      await sendTemplateForEntryPayment(isUser?.mobile, isUser?.fullname, isUser?.userId, Package?.isp?.vlan, tid, expiryDate);
     }
 
     res.send(Entry);

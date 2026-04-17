@@ -107,6 +107,7 @@ const sendEmailByReminder = (to, subject, html, ccc) => {
       console.log(error);
     } else {
       console.log("Email sent: " + info.response);
+      console.log("kjnn")
     }
   });
 };

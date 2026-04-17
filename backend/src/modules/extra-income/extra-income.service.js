@@ -15,14 +15,16 @@ extraIncomeService.createExtraIncome = async (ExtraIncomeBody) => {
  * Get All Completed ExtraIncomes
  * @param {String} startDate
  * @param {String} endDate
+ * @param {ObjectId} organizationId
  * @returns {Promise<ExtraIncomeModel>}
  */
-extraIncomeService.getAllCompletedExtraIncomes = async (startDate, endDate) => {
+extraIncomeService.getAllCompletedExtraIncomes = async (startDate, endDate, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
   return await ExtraIncomeModel.find({
+    organizationId,
     date:
       endDate === "" || startDate === endDate
         ? new Date(startDate)
@@ -35,14 +37,16 @@ extraIncomeService.getAllCompletedExtraIncomes = async (startDate, endDate) => {
  * Get All Pending ExtraIncomes
  * @param {String} startDate
  * @param {String} endDate
+ * @param {ObjectId} organizationId
  * @returns {Promise<ExtraIncomeModel>}
  */
-extraIncomeService.getAllPendingExtraIncomes = async (startDate, endDate) => {
+extraIncomeService.getAllPendingExtraIncomes = async (startDate, endDate, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
   return await ExtraIncomeModel.find({
+    organizationId,
     date:
       endDate === "" || startDate === endDate
         ? new Date(startDate)

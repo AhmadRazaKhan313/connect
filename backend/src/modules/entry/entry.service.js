@@ -24,15 +24,17 @@ entryService.createEntry = async (EntryBody) => {
  * @param {String} startDate
  * @param {String} endDate
  * @param {ObjectId} isp
+ * @param {ObjectId} organizationId
  * @returns {Promise<EntryModel>}
  */
-entryService.getAlCompletedlEntries = async (startDate, endDate, isp) => {
+entryService.getAlCompletedlEntries = async (startDate, endDate, isp, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
 
   let query = { isp };
+  if (organizationId) query.organizationId = organizationId;
   if (!endDate || endDate === "" || startDate.getTime() === endDate.getTime()) {
     query.entryDate = startDate;
   } else {
@@ -46,15 +48,12 @@ entryService.getAlCompletedlEntries = async (startDate, endDate, isp) => {
  * Get All Completed Entries Without ISP
  * @param {String} startDate
  * @param {String} endDate
+ * @param {ObjectId} organizationId
  * @returns {Promise<EntryModel>}
  */
-entryService.getAlCompletedlEntriesWithoutIsp = async (startDate, endDate) => {
-  // if (endDate.toISOString().includes("T19")) {
-  //   endDate.setUTCDate(endDate.getUTCDate() + 1);
-  //   endDate.setUTCHours(0, 0, 0, 0);
-  // }
-
+entryService.getAlCompletedlEntriesWithoutIsp = async (startDate, endDate, organizationId) => {
   let query = { paymentMethod: { $ne: "pending" } };
+  if (organizationId) query.organizationId = organizationId;
   if (!endDate || endDate === "" || startDate.getTime() === endDate.getTime()) {
     query.entryDate = startDate;
   } else {
@@ -66,10 +65,13 @@ entryService.getAlCompletedlEntriesWithoutIsp = async (startDate, endDate) => {
 
 /**
  * Get All Pending Entries
+ * @param {ObjectId} organizationId
  * @returns {Promise<EntryModel>}
  */
-entryService.getAlPendinglEntries = async () => {
-  return await EntryModel.find({ paymentMethod: "pending" })
+entryService.getAlPendinglEntries = async (organizationId) => {
+  const filter = { paymentMethod: "pending" };
+  if (organizationId) filter.organizationId = organizationId;
+  return await EntryModel.find(filter)
     .populate("isp")
     .populate("package");
 };
@@ -78,15 +80,12 @@ entryService.getAlPendinglEntries = async () => {
  * Get All Pending Entries Without ISP
  * @param {String} startDate
  * @param {String} endDate
+ * @param {ObjectId} organizationId
  * @returns {Promise<EntryModel>}
  */
-entryService.getAllPendingEntriesWithoutIsp = async (startDate, endDate) => {
-  // if (endDate.toISOString().includes("T19")) {
-  //   endDate.setUTCDate(endDate.getUTCDate() + 1);
-  //   endDate.setUTCHours(0, 0, 0, 0);
-  // }
-
+entryService.getAllPendingEntriesWithoutIsp = async (startDate, endDate, organizationId) => {
   let query = { paymentMethod: "pending" };
+  if (organizationId) query.organizationId = organizationId;
   if (!endDate || endDate === "" || startDate.getTime() === endDate.getTime()) {
     query.entryDate = startDate;
   } else {
@@ -100,36 +99,33 @@ entryService.getAllPendingEntriesWithoutIsp = async (startDate, endDate) => {
  * Get All Pending Entries Within date range
  * @param {String} startDate
  * @param {String} endDate
+ * @param {ObjectId} organizationId
  * @returns {Promise<EntryModel>}
  */
-entryService.getAllPendingEntriesWithinDateRange = async (
-  startDate,
-  endDate
-) => {
+entryService.getAllPendingEntriesWithinDateRange = async (startDate, endDate, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
 
   let query = { paymentMethod: "pending" };
+  if (organizationId) query.organizationId = organizationId;
   if (!endDate || endDate === "" || startDate.getTime() === endDate.getTime()) {
     query.entryDate = startDate;
   } else {
     query.entryDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
   }
 
-  return await EntryModel.find(query).populate("isp").populate("package");;
+  return await EntryModel.find(query).populate("isp").populate("package");
 };
 
 /**
  * Get All Pending Entries
+ * @param {Date} dateFrom
+ * @param {Date} dateTo
  * @returns {Promise<EntryModel>}
  */
 entryService.getAlPendinglEntriesBetweenDate = async (dateFrom, dateTo) => {
-  // if (dateTo.toISOString().includes("T19")) {
-  //   dateTo.setUTCDate(dateTo.getUTCDate() + 1);
-  //   dateTo.setUTCHours(0, 0, 0, 0);
-  // }
   return await EntryModel.find({
     paymentMethod: "pending",
     entryDate: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },

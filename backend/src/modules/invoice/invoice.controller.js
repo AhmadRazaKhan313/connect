@@ -4,7 +4,6 @@ const catchAsync = require("../../utils/catchAsync");
 const { invoiceService, ispService, entryService } = require("../../services");
 let invoiceController = {};
 
-
 invoiceController.createInvoice = catchAsync(async (req, res) => {
   if (req?.body?.date.toISOString().includes("T19")) {
     req.body.date.setUTCDate(req.body.date.getUTCDate() + 1);
@@ -13,7 +12,7 @@ invoiceController.createInvoice = catchAsync(async (req, res) => {
   const isIsp = await ispService.getIspById(req.body.isp);
   if (!isIsp) throw new ApiError(httpStatus.NOT_FOUND, "Isp Not Found");
   else {
-    const invoice = await invoiceService.createInvoice(req.body);
+    const invoice = await invoiceService.createInvoice({ ...req.body, organizationId: req.organizationId });
     await ispService.updateIspById(isIsp?.id, {
       openingBalance: isIsp?.openingBalance + req?.body?.amount,
     });
@@ -25,7 +24,8 @@ invoiceController.getAllInvoices = catchAsync(async (req, res) => {
   const entries = await entryService.getAlCompletedlEntries(
     req?.body?.startDate,
     req?.body?.endDate,
-    req?.body?.isp
+    req?.body?.isp,
+    req.organizationId
   );
   if (!entries || entries.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Completed Entries");
@@ -40,7 +40,8 @@ invoiceController.getSentInvoices = catchAsync(async (req, res) => {
   const invoices = await invoiceService.getSentInvoices(
     req?.body?.startDate,
     req?.body?.endDate,
-    req?.body?.isp
+    req?.body?.isp,
+    req.organizationId
   );
   if (!invoices || invoices.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Sent Invoices");

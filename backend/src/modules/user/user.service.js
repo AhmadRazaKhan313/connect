@@ -37,10 +37,13 @@ userService.getUserByUserId = async (userId) => {
 
 /**
  * Get All Users
+ * @param {ObjectId} organizationId
  * @returns {Promise<UserModel>}
  */
-userService.getAllUsers = async () => {
-  return UserModel.find({}).sort({ userId: "asc" });
+userService.getAllUsers = async (organizationId) => {
+  const filter = {};
+  if (organizationId) filter.organizationId = organizationId;
+  return UserModel.find(filter).sort({ userId: "asc" });
 };
 
 /**
@@ -65,12 +68,12 @@ userService.deleteUserById = async (id) => {
 
 /**
  * @param {String} userId
+ * @param {ObjectId} organizationId
  */
-userService.getAutoCompletedUsers = async (userId) => {
-  const users = await UserModel.find(
-    { userId: { $regex: new RegExp(userId, "i") } } // Case-insensitive regex search for userId
-  );
-
+userService.getAutoCompletedUsers = async (userId, organizationId) => {
+  const filter = { userId: { $regex: new RegExp(userId, "i") } };
+  if (organizationId) filter.organizationId = organizationId;
+  const users = await UserModel.find(filter);
   const suggestions = users.map((user) => user.userId);
   return suggestions;
 };

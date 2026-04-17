@@ -1,6 +1,8 @@
 const allRoles = {
-  superadmin: [],
-  staff: [],
+  platformSuperAdmin: [],
+  orgSuperAdmin: [],
+  orgAdmin: [],
+  orgStaff: [],
 };
 
 const roles = Object.keys(allRoles);

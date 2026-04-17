@@ -7,21 +7,21 @@ const { sendSms, sendTemplateForWelcome } = require("../../services/email.servic
 let userController = {};
 
 userController.createUser = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
+  const user = await userService.createUser({ ...req.body, organizationId: req.organizationId });
   if (user) {
     if (
       req?.body?.sendWelcomeMessage &&
       req?.body?.mobile &&
       req?.body?.mobile !== ""
     ) {
-      await sendTemplateForWelcome(req?.body?.mobile, user?.fullname, user?.userId)
+      await sendTemplateForWelcome(req?.body?.mobile, user?.fullname, user?.userId);
     }
     res.status(httpStatus.CREATED).send(user);
   }
 });
 
 userController.getAllUsers = catchAsync(async (req, res) => {
-  const users = await userService.getAllUsers();
+  const users = await userService.getAllUsers(req.organizationId);
   if (!users || users.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Users");
   }
@@ -48,7 +48,7 @@ userController.updateUserById = catchAsync(async (req, res) => {
         newUser?.mobile &&
         newUser?.mobile !== ""
       ) {
-        await sendTemplateForWelcome(req?.body?.mobile, user?.fullname, user?.userId)
+        await sendTemplateForWelcome(req?.body?.mobile, user?.fullname, user?.userId);
       }
     }
     res.send(User);
@@ -66,7 +66,7 @@ userController.deleteUserById = catchAsync(async (req, res) => {
 
 userController.sendCustomMessage = catchAsync(async (req, res) => {
   const { message } = req?.body;
-  const users = await userService.getAllUsers();
+  const users = await userService.getAllUsers(req.organizationId);
   if (!users) throw new ApiError(httpStatus.NOT_FOUND, "No Users Found");
   else {
     users.forEach((user) => {
@@ -78,7 +78,7 @@ userController.sendCustomMessage = catchAsync(async (req, res) => {
 
 userController.getAutoCompleteUsers = catchAsync(async (req, res) => {
   const { userId } = req?.body;
-  const users = await userService.getAutoCompletedUsers(userId);
+  const users = await userService.getAutoCompletedUsers(userId, req.organizationId);
   res.send(users);
 });
 

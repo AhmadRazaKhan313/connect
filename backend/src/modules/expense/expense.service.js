@@ -25,22 +25,23 @@ expenseService.getExpenseById = async (id) => {
  * @param {String} startDate
  * @param {String} endDate
  * @param {String} spentBy
+ * @param {ObjectId} organizationId
  * @returns {Promise<ExpenseModel>}
  */
-expenseService.getAllExpenses = async (startDate, endDate, spentBy) => {
+expenseService.getAllExpenses = async (startDate, endDate, spentBy, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
-  return ExpenseModel.find({
+  const filter = {
     date:
       endDate === "" || startDate === endDate
         ? new Date(startDate)
         : { $gte: new Date(startDate), $lte: new Date(endDate) },
     spentBy,
-  })
-    .sort({ date: 1 })
-    .populate("staff");
+  };
+  if (organizationId) filter.organizationId = organizationId;
+  return ExpenseModel.find(filter).sort({ date: 1 }).populate("staff");
 };
 
 /**
@@ -48,22 +49,23 @@ expenseService.getAllExpenses = async (startDate, endDate, spentBy) => {
  * @param {String} startDate
  * @param {String} endDate
  * @param {String} status
+ * @param {ObjectId} organizationId
  * @returns {Promise<ExpenseModel>}
  */
-expenseService.getAllExpensesByStatus = async (startDate, endDate, status) => {
+expenseService.getAllExpensesByStatus = async (startDate, endDate, status, organizationId) => {
   if (endDate.toISOString().includes("T19")) {
     endDate.setUTCDate(endDate.getUTCDate() + 1);
     endDate.setUTCHours(0, 0, 0, 0);
   }
-  return ExpenseModel.find({
+  const filter = {
     date:
       endDate === "" || startDate === endDate
         ? new Date(startDate)
         : { $gte: new Date(startDate), $lte: new Date(endDate) },
     status,
-  })
-    .sort({ date: 1 })
-    .populate("staff");
+  };
+  if (organizationId) filter.organizationId = organizationId;
+  return ExpenseModel.find(filter).sort({ date: 1 }).populate("staff");
 };
 
 /**

@@ -9,11 +9,16 @@ const expenseRoute = require("../../modules/expense/expense.route");
 const summaryRoute = require("../../modules/summary/summary.route");
 const smsSendingRoute = require("../../modules/sms-sending/smsSending.route");
 const extraIncomeRoute = require("../../modules/extra-income/extra-income.route");
+const organizationRoute = require("../../modules/organization/organization.route");
 
 const ROUTES = [
   {
     path: "/auth",
     route: authRoute,
+  },
+  {
+    path: "/organization",
+    route: organizationRoute,
   },
   {
     path: "/isp",
@@ -53,8 +58,8 @@ const ROUTES = [
   },
   {
     path: "/extra-income",
-    route: extraIncomeRoute
-  }
+    route: extraIncomeRoute,
+  },
 ];
 
 module.exports = ROUTES;

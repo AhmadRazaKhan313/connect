@@ -9,9 +9,10 @@ const { s3 } = require("../../services/s3Service");
 let staffController = {};
 
 staffController.createStaff = catchAsync(async (req, res) => {
-  const partners = await staffService.getAllPartners();
-  if (req?.body.type === STAFF_TYPES.staff) {
-    const staff = await staffService.createStaff(req.body);
+  const { organizationId } = req;
+  const partners = await staffService.getAllPartners(organizationId);
+  if (req?.body.type === STAFF_TYPES.orgStaff) {
+    const staff = await staffService.createStaff({ ...req.body, organizationId });
     sendSmsAndEmail(staff, req?.body);
     res.status(httpStatus.CREATED).send(staff);
   } else {
@@ -25,7 +26,7 @@ staffController.createStaff = catchAsync(async (req, res) => {
         `Max share limit remaining is ${100 - allPartnersShare}`
       );
     } else {
-      const staff = await staffService.createStaff(req.body);
+      const staff = await staffService.createStaff({ ...req.body, organizationId });
       sendSmsAndEmail(staff, req?.body);
       res.status(httpStatus.CREATED).send(staff);
     }
@@ -46,7 +47,7 @@ async function sendSmsAndEmail(staff, body) {
 }
 
 staffController.getAllStaffs = catchAsync(async (req, res) => {
-  const staffs = await staffService.getAllStaffs();
+  const staffs = await staffService.getAllStaffs(req.organizationId);
   if (!staffs || staffs.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Staffs");
   }
@@ -62,7 +63,7 @@ staffController.getStaff = catchAsync(async (req, res) => {
 });
 
 staffController.getAllPartners = catchAsync(async (req, res) => {
-  const partners = await staffService.getAllPartners();
+  const partners = await staffService.getAllPartners(req.organizationId);
   if (!partners || partners.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No partners found");
   }

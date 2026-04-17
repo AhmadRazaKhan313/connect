@@ -9,6 +9,7 @@ entryController.createExtraIncome = catchAsync(async (req, res) => {
     req.body.date.setUTCDate(req.body.date.getUTCDate() + 1);
     req.body.date.setUTCHours(0, 0, 0, 0);
   }
+  req.body.organizationId = req.organizationId;
   const extraIncome = await extraIncomeService.createExtraIncome(req.body);
   res.status(httpStatus.CREATED).send(extraIncome);
 });
@@ -16,7 +17,8 @@ entryController.createExtraIncome = catchAsync(async (req, res) => {
 entryController.getAllCompletedExtraIncomes = catchAsync(async (req, res) => {
   const allExtraIncomes = await extraIncomeService.getAllCompletedExtraIncomes(
     req?.body?.startDate,
-    req?.body?.endDate
+    req?.body?.endDate,
+    req.organizationId
   );
   if (!allExtraIncomes || allExtraIncomes.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Completed Extra Incomes");
@@ -39,7 +41,8 @@ entryController.getAllCompletedExtraIncomes = catchAsync(async (req, res) => {
 entryController.getAllPendingExtraIncomes = catchAsync(async (req, res) => {
   const allExtraIncomes = await extraIncomeService.getAllPendingExtraIncomes(
     req?.body?.startDate,
-    req?.body?.endDate
+    req?.body?.endDate,
+    req.organizationId
   );
   if (!allExtraIncomes || allExtraIncomes.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Pending Extra Incomes");

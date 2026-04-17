@@ -33,19 +33,25 @@ staffService.getStaffByEmail = async (email) => {
 
 /**
  * Get All Staffs
+ * @param {ObjectId} organizationId
  * @returns {Promise<StaffModel>}
  */
-staffService.getAllStaffs = async () => {
-  return await StaffModel.find({ type: { $ne: "superadmin" } });
+staffService.getAllStaffs = async (organizationId) => {
+  const filter = { type: { $ne: STAFF_TYPES.platformSuperAdmin } };
+  if (organizationId) filter.organizationId = organizationId;
+  return await StaffModel.find(filter);
 };
 
 /**
  * Get All Staffs
  * @param {String} type
+ * @param {ObjectId} organizationId
  * @returns {Promise<StaffModel>}
  */
-staffService.getStaffsByType = async (type) => {
-  return await StaffModel.find({ type });
+staffService.getStaffsByType = async (type, organizationId) => {
+  const filter = { type };
+  if (organizationId) filter.organizationId = organizationId;
+  return await StaffModel.find(filter);
 };
 
 /**
@@ -59,12 +65,13 @@ staffService.getStaffById = async (id) => {
 
 /**
  * Get All Partners
+ * @param {ObjectId} organizationId
  * @returns {Promise<StaffModel>}
  */
-staffService.getAllPartners = async () => {
-  return await StaffModel.find({
-    type: { $in: [STAFF_TYPES.admin, STAFF_TYPES.partner] },
-  });
+staffService.getAllPartners = async (organizationId) => {
+  const filter = { type: { $in: [STAFF_TYPES.orgAdmin, STAFF_TYPES.orgStaff] } };
+  if (organizationId) filter.organizationId = organizationId;
+  return await StaffModel.find(filter);
 };
 
 /**

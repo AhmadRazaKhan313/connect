@@ -43,6 +43,11 @@ const PackageSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Staff",
     },
+    organizationId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Organization',
+  default: null,
+},
   },
   {
     timestamps: true
