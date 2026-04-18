@@ -1,0 +1,119 @@
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import { Alert, Button, Chip } from '@mui/material';
+import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import { useState, useEffect } from 'react';
+import jwt from 'jwtservice/jwtService';
+import { useNavigate } from 'react-router';
+
+export default function AllOrganizations() {
+    const [organizations, setOrganizations] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isError, setIsError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
+
+    const style = { backgroundColor: THEME_COLOR_LIGHT, color: 'white' };
+
+    useEffect(() => {
+        setIsLoading(true);
+        jwt.getAllOrganizations()
+            .then((res) => {
+                setIsLoading(false);
+                setOrganizations(res?.data);
+            })
+            .catch((err) => {
+                setErrorMessage(err?.response?.data?.message);
+                setIsError(true);
+                setIsLoading(false);
+            });
+    }, []);
+
+    const handleStatusToggle = (id, currentStatus) => {
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        jwt.updateOrganizationStatus(id, newStatus)
+            .then(() => {
+                // ✅ Fix: org._id use kiya
+                setOrganizations((prev) =>
+                    prev.map((org) => (org.id === id ? { ...org, status: newStatus } : org))
+                );
+                alert('Status Updated');
+            })
+            .catch((err) => alert(err?.response?.data?.message));
+    };
+
+    return (
+        <Paper sx={{ width: '100%', overflow: 'hidden', mt: 4 }}>
+            <Button
+                variant="contained"
+                sx={{ m: 2, backgroundColor: THEME_COLOR_LIGHT }}
+                onClick={() => navigate('/dashboard/add-organization')}
+            >
+                Add Organization
+            </Button>
+            {isLoading && <h3>Loading...!</h3>}
+            {isError ? (
+                <Alert severity="error">{errorMessage}</Alert>
+            ) : (
+                <TableContainer>
+                    <Table stickyHeader>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell style={style}>Sr.</TableCell>
+                                <TableCell style={style}>Name</TableCell>
+                                <TableCell style={style}>Email</TableCell>
+                                <TableCell style={style}>Mobile</TableCell>
+                                <TableCell style={style}>Subdomain</TableCell>
+                                <TableCell style={style}>Status</TableCell>
+                                <TableCell style={style}>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {organizations.map((org, index) => (
+                               <TableRow key={org.id}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{org.name}</TableCell>
+                                    <TableCell>{org.email}</TableCell>
+                                    <TableCell>{org.mobile}</TableCell>
+                                    <TableCell>{org.subdomain}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={org.status}
+                                            color={org.status === 'active' ? 'success' : 'error'}
+                                            size="small"
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            color={org.status === 'active' ? 'error' : 'success'}
+                                            // ✅ Fix: org._id use 
+                                            onClick={() => handleStatusToggle(org.id, org.status)}
+                                            sx={{ mr: 1 }}
+                                        >
+                                            {org.status === 'active' ? 'Deactivate' : 'Activate'}
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            // ✅ Fix: useParams match with— /edit-organization/:id
+                                           onClick={() => navigate(`/dashboard/edit-organization/${org.id}`)}
+                                        >
+                                            Edit
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
+        </Paper>
+    );
+}

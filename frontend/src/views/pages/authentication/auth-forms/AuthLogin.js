@@ -73,9 +73,14 @@ const FirebaseLogin = ({ setOpenModal, ...others }) => {
                                     jwt.setToken(res.data.tokens.access.token);
                                     jwt.setRefreshToken(res.data.tokens.refresh.token);
                                     jwt.setUser({ ...res?.data?.user, time: Date.now() });
-                                    jwt.setIsLogin(true);
+                                   jwt.setIsLogin(true);
                                     setIsLoading(false);
-                                    navigate(0);
+                                    const role = res?.data?.user?.role;
+                                    if (role === 'platformSuperAdmin') {
+                                    navigate('/dashboard/all-organizations');
+                                    } else {
+                                        navigate('/dashboard');
+                                    }
                                 })
                                 .catch((err) => {
                                     setErrorMessage(err?.response?.data?.message);

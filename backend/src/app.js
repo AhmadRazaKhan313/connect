@@ -15,11 +15,18 @@ const summaryController = require("./modules/summary/summary.controller");
 const { EntryModel } = require("./models");
 const { Mutex } = require("async-mutex");
 const mutex = new Mutex();
+const subdomainMiddleware = require("./middlewares/subdomain");
+
+
 
 const app = express();
 
 // set security HTTP headers
 app.use(helmet());
+
+
+// before Auth middleware
+app.use(subdomainMiddleware);
 
 // parse json request body
 app.use(express.json());

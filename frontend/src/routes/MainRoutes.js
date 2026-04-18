@@ -5,6 +5,9 @@ import Loadable from 'ui-component/Loadable';
 import jwt from 'jwtservice/jwtService';
 import { Navigate } from 'react-router';
 
+const AddOrganization = Loadable(lazy(() => import('views/organization/AddOrganization')));
+const AllOrganizations = Loadable(lazy(() => import('views/organization/AllOrganizations')));
+const EditOrganization = Loadable(lazy(() => import('views/organization/EditOrganization')));
 const MainLayout = Loadable(lazy(() => import('layout/MainLayout')));
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const AddISP = Loadable(lazy(() => import('views/isps/AddISP')));
@@ -165,7 +168,19 @@ const MainRoutes = {
         {
             path: '/dashboard/edit-extra-income',
             element: checkLogin(<EditExtraIncome />)
-        }
+        },
+        {
+    path: '/dashboard/add-organization',
+    element: checkLogin(<AddOrganization />)
+},
+{
+    path: '/dashboard/all-organizations',
+    element: checkLogin(<AllOrganizations />)
+},
+{
+    path: '/dashboard/edit-organization/:id',
+    element: checkLogin(<EditOrganization />)
+}
     ]
 };
 

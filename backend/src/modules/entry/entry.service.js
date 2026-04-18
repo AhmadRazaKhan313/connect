@@ -125,11 +125,13 @@ entryService.getAllPendingEntriesWithinDateRange = async (startDate, endDate, or
  * @param {Date} dateTo
  * @returns {Promise<EntryModel>}
  */
-entryService.getAlPendinglEntriesBetweenDate = async (dateFrom, dateTo) => {
-  return await EntryModel.find({
+entryService.getAlPendinglEntriesBetweenDate = async (dateFrom, dateTo, organizationId) => {
+  const filter = {
     paymentMethod: "pending",
     entryDate: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },
-  })
+  };
+  if (organizationId) filter.organizationId = organizationId;
+  return await EntryModel.find(filter)
     .populate("isp")
     .populate("package");
 };

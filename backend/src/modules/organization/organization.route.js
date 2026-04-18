@@ -22,4 +22,7 @@ router.patch("/:id/status", auth(), organizationController.updateStatus);
 // Delete organization
 router.delete("/:id", auth(), organizationController.deleteOrganization);
 
+// features update in Organization
+router.patch("/:id/features", auth(), organizationController.updateFeatures);
+
 module.exports = router;

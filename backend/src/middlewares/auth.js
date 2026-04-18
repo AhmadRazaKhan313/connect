@@ -13,8 +13,13 @@ const verifyCallback =
       try {
         req.user = user;
 
-        // organizationId request mein inject karo
-        req.organizationId = user.role === "platformSuperAdmin" ? null : user.organizationId;
+        // set organizationId — subdomain check
+        if (user.role === "platformSuperAdmin") {
+          req.organizationId = req.subdomainOrgId || null;
+        } else {
+          // Baaki sab — apni organizationId
+          req.organizationId = user.organizationId;
+        }
 
         if (requiredRights.length) {
           const userRights = roleRights.get(user.role);

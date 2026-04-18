@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
+import PlatformDashboard from './PlatformDashboard';
+import jwt from 'jwtservice/jwtService';
 
 // material-ui
-import { Divider, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material';
+import { FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material';
 
 // project imports
 import TotalIncomeDarkCard from './TotalIncomeDarkCard';
 import { gridSpacing } from 'store/constant';
 import IspGrandSummaryCard from './IspGrandSummaryCard';
-import jwt from 'jwtservice/jwtService';
 import RemainingProfitCard from './RemainingProfitCard';
 import PartnerGrandSummaryCard from './PartnerGrandSummaryCard';
-import useAppContext from 'context/useAppContext';
-import extraIncome from 'menu-items/extra-income';
 import { STAFF_TYPES } from 'utils/Constants';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
@@ -44,7 +43,11 @@ const Dashboard = () => {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, index) => startYear + index);
 
+    // ─── platformSuperAdmin check — hooks ke baad, useEffect se pehle ───
+    const role = jwt.getUser()?.role;
+
     useEffect(() => {
+        if (role === 'platformSuperAdmin') return; // summary call mat karo
         if (selectedMonth && selectedYear) {
             getSummary(selectedMonth, selectedYear);
         }
@@ -71,6 +74,11 @@ const Dashboard = () => {
                 setLoading(false);
             });
     };
+
+    // ─── platformSuperAdmin ko alag dashboard dikhao ───
+    if (role === 'platformSuperAdmin') {
+        return <PlatformDashboard />;
+    }
 
     return (
         <Grid container spacing={gridSpacing}>
@@ -197,16 +205,6 @@ const Dashboard = () => {
                             />
                         </Grid>
                     </Grid>
-                    {/* <Grid container item spacing={2}>
-                        <Grid item sm={12} xs={12} md={12} lg={12}>
-                            <RemainingProfitCard
-                                color="#4da6ff"
-                                isLoading={isLoading}
-                                title="Total Extra Income"
-                                total={totalExtraIncome}
-                            />
-                        </Grid>
-                    </Grid> */}
                     <MyDivider />
                     <>
                         {(jwt.getUser()?.type === STAFF_TYPES.partner

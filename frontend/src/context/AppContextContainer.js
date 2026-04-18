@@ -10,11 +10,16 @@ function AppContextContainer({ children }) {
     const [filters, setFilters] = useState([]);
     const [smsBalance, setSmsBalance] = useState('');
     const [ispSelected, setIspSelected] = useState('');
+    const [orgFeatures, setOrgFeatures] = useState(null);
     const [startDate, setStartDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
 
     useEffect(() => {
-        getSmsBalance();
+        const role = jwt.getUser()?.role;
+        if (role !== 'platformSuperAdmin') {
+            getSmsBalance();
+            loadOrgFeatures();
+        }
     }, []);
 
     const getSmsBalance = async () => {
@@ -27,21 +32,26 @@ function AppContextContainer({ children }) {
             });
     };
 
+    const loadOrgFeatures = async () => {
+        const user = jwt.getUser();
+        if (user?.organizationId) {
+            jwt.getOrganizationById(user.organizationId)
+                .then((res) => {
+                    setOrgFeatures(res?.data?.features);
+                })
+                .catch((err) => console.log(err));
+        }
+    };
+
     const contextValues = {
-        data,
-        setData,
-        filteredData,
-        setFilteredData,
-        filters,
-        setFilters,
-        smsBalance,
-        getSmsBalance,
-        ispSelected,
-        setIspSelected,
-        startDate,
-        setStartDate,
-        endDate,
-        setEndDate
+        data, setData,
+        filteredData, setFilteredData,
+        filters, setFilters,
+        smsBalance, getSmsBalance,
+        ispSelected, setIspSelected,
+        startDate, setStartDate,
+        endDate, setEndDate,
+        orgFeatures
     };
 
     return <AppContextProvider value={contextValues}>{children}</AppContextProvider>;

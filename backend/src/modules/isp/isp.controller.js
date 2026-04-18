@@ -11,13 +11,14 @@ ispController.createIsp = catchAsync(async (req, res) => {
   if (isIspAlreadyRegistered)
     throw new ApiError(httpStatus.NOT_FOUND, "VLAN Already Assigned");
   else {
+    req.body.organizationId = req.organizationId;
     const isp = await ispService.createIsp(req.body);
     res.status(httpStatus.CREATED).send(isp);
   }
 });
 
 ispController.getAllisps = catchAsync(async (req, res) => {
-  const isps = await ispService.getAllIsps();
+  const isps = await ispService.getAllIsps(req.organizationId);
   if (!isps || isps.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "No isps");
   }
@@ -65,11 +66,6 @@ ispController.sendServerDownAlert = catchAsync(async (req, res) => {
   users.forEach(async (user) => {
     const message = `Dear ${user?.fullname}, Internet server is down and will be up soon, ETTR will be share ASAP. Thankyou for your cooperation`;
     await sendSms(user?.mobile, message);
-    // await sendEmailByInfo(
-    //   user?.email,
-    //   "Server Down",
-    //   getEmailFormat("Server Down", message)
-    // );
   });
   res.send("Server Down");
 });
@@ -86,11 +82,6 @@ ispController.sendServerUpAlert = catchAsync(async (req, res) => {
   users.forEach(async (user) => {
     const message = `Dear ${user?.fullname}, Internet service has been restored, please check carefully. Thankyou for your cooperation`;
     await sendSms(user?.mobile, message);
-    // await sendEmailByInfo(
-    //   user?.email,
-    //   "Service Restored",
-    //   getEmailFormat("Service Restored", message)
-    // );
   });
   res.send("Server Up");
 });

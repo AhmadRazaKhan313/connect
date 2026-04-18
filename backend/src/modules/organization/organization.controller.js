@@ -1,10 +1,29 @@
 const catchAsync = require("../../utils/catchAsync");
 const organizationService = require("./organization.service");
 const httpStatus = require("http-status");
+const ApiError = require("../../utils/ApiError");
 
 let organizationController = {};
 
+organizationController.updateFeatures = catchAsync(async (req, res) => {
+  const result = await organizationService.updateOrganization(
+    req.params.id, 
+    { features: req.body.features }
+  );
+  res.send({ message: "Features updated" });
+});
+
 organizationController.createOrganization = catchAsync(async (req, res) => {
+  // Email check
+  const existingEmail = await organizationService.getOrganizationByEmail(req.body.email);
+  if (existingEmail)
+    throw new ApiError(httpStatus.BAD_REQUEST, "Email already registered");
+
+  // Subdomain check
+  const existingSubdomain = await organizationService.getOrganizationBySubdomain(req.body.subdomain);
+  if (existingSubdomain)
+    throw new ApiError(httpStatus.BAD_REQUEST, "Subdomain already taken");
+
   const org = await organizationService.createOrganization(req.body);
   res.status(httpStatus.CREATED).send(org);
 });
@@ -27,13 +46,13 @@ organizationController.updateOrganization = catchAsync(async (req, res) => {
   res.send(result);
 });
 
-organizationController.deleteOrganization = catchAsync(async (req, res) => {
-  const result = await organizationService.deleteOrganization(req.params.id);
+organizationController.updateStatus = catchAsync(async (req, res) => {
+  const result = await organizationService.updateStatus(req.params.id, req.body.status);
   res.send({ message: result });
 });
 
-organizationController.updateStatus = catchAsync(async (req, res) => {
-  const result = await organizationService.updateStatus(req.params.id, req.body.status);
+organizationController.deleteOrganization = catchAsync(async (req, res) => {
+  const result = await organizationService.deleteOrganization(req.params.id);
   res.send({ message: result });
 });
 

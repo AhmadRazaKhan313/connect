@@ -22,8 +22,9 @@ summaryController.getSummary = catchAsync(async (req, res) => {
   const { month, year } = req?.body;
   if (month && year) {
     const { dateFrom, dateTo } = getFirstAndLastDate(month, year);
+    const organizationId = req.organizationId;
 
-    const ispsData = await summaryService.getSummaryByIsp(dateFrom, dateTo);
+    const ispsData = await summaryService.getSummaryByIsp(dateFrom, dateTo, organizationId);
 
     const totalIncome = ispsData.reduce(
       (acc, item) => acc + +item?.totalProfit,
@@ -32,12 +33,14 @@ summaryController.getSummary = catchAsync(async (req, res) => {
 
     const companyExpense = await summaryService.getCompanyExpense(
       dateFrom,
-      dateTo
+      dateTo,
+      organizationId
     );
 
     const partnersTotalExpense = await summaryService.getPartnersTotalEpxense(
       dateFrom,
-      dateTo
+      dateTo,
+      organizationId
     );
 
     const companyProfit = totalIncome - companyExpense;
@@ -46,11 +49,12 @@ summaryController.getSummary = catchAsync(async (req, res) => {
     const partnersExpenses = await summaryService.getPartnersEpxenses(
       dateFrom,
       dateTo,
-      companyProfit
+      companyProfit,
+      organizationId
     );
 
     const totalPendingEntries =
-      await entryService.getAlPendinglEntriesBetweenDate(dateFrom, dateTo);
+      await entryService.getAlPendinglEntriesBetweenDate(dateFrom, dateTo, organizationId);
     const totalPendingAmount = totalPendingEntries.reduce(
       (acc, item) => (acc += +item?.package?.saleRate),
       0
@@ -58,14 +62,15 @@ summaryController.getSummary = catchAsync(async (req, res) => {
 
     const totalExtraIncome = await summaryService.getTotalExtraIncome(
       dateFrom,
-      dateTo
+      dateTo,
+      organizationId
     );
 
     const totalNumberOfCompletedEntries =
-      await entryService.getAlCompletedlEntriesWithoutIsp(dateFrom, dateTo);
+      await entryService.getAlCompletedlEntriesWithoutIsp(dateFrom, dateTo, organizationId);
 
     const totalNumberOfPendingEntries =
-      await entryService.getAllPendingEntriesWithoutIsp(dateFrom, dateTo);
+      await entryService.getAllPendingEntriesWithoutIsp(dateFrom, dateTo, organizationId);
 
     res.send({
       ispsData,
@@ -96,20 +101,6 @@ summaryController.sendEmailsAndMessagesForTomorrowExpiry = async () => {
   const expiredEntries = await entryService.getEntriesToExpireTomorrow();
   console.log("Total entries to expire tomorrow:", expiredEntries.length);
   let counter = 1;
-  // await Promise.all(
-  //   expiredEntries.map(async (item) => {
-  //     console.log("Processing entry:", counter);
-  //     counter++;
-  //     const name = item?.user?.fullname;
-  //     const userid = item?.user?.userId;
-  //     const vlan = item?.entry?.isp?.vlan;
-  //     const date = moment(item?.entry?.expiryDate).format("DD-MMM-YYYY");
-  //     const email = item?.user?.email;
-  //     const html = getEmailFormatForPackageExpiry(name, userid, vlan, date);
-  //     console.log("Sending SMS to:", item?.user?.mobile);
-  //     await sendTemplateForExpiry(item?.user?.mobile, name, userid, vlan, date)
-  //   })
-  // );
 
   for (const item of expiredEntries) {
     const name = item?.user?.fullname;
@@ -130,7 +121,6 @@ summaryController.sendEmailsAndMessagesForTomorrowExpiry = async () => {
     } catch (err) {
       console.log(err);
     }
-
 
     // small delay (VERY IMPORTANT)
     await new Promise((res) => setTimeout(res, 10000));

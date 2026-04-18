@@ -328,6 +328,39 @@ class JwtService {
   deleteExtraIncome(id) {
     return axios.delete(`${this.jwtConfig.extraIncomeEndpoint}/${id}`);
   }
+
+  // ─── Organization ────────────────────────────────────────────────
+  createOrganization(payload) {
+    return axios.post(this.jwtConfig.organizationEndpoint, payload);
+  }
+
+  getAllOrganizations() {
+    return axios.get(this.jwtConfig.organizationEndpoint);
+  }
+
+  // NEW —  for EditOrganization
+  getOrganization(id) {
+    return axios.get(`${this.jwtConfig.organizationEndpoint}/${id}`);
+  }
+  getOrganizationById(id) {
+    return axios.get(`${this.jwtConfig.organizationEndpoint}/${id}`);
+  }
+  
+  updateOrganization(id, payload) {
+    return axios.put(`${this.jwtConfig.organizationEndpoint}/${id}`, payload);
+  }
+ 
+  updateOrganizationStatus(id, status) {
+    return axios.patch(`${this.jwtConfig.organizationEndpoint}/${id}/status`, { status });
+  }
+
+  updateOrganizationFeatures(id, features) {
+    return axios.patch(`${this.jwtConfig.organizationEndpoint}/${id}/features`, { features });
+  }
+
+  deleteOrganization(id) {
+    return axios.delete(`${this.jwtConfig.organizationEndpoint}/${id}`);
+  }
 }
 
 const jwt = new JwtService();

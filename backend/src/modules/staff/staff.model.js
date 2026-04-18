@@ -33,7 +33,7 @@ const StaffSchema = mongoose.Schema(
     type: {
       type: String,
       required: [true, "Type is required"],
-      enum: [STAFF_TYPES.superadmin, STAFF_TYPES.admin, STAFF_TYPES.partner, STAFF_TYPES.staff],
+      enum: [STAFF_TYPES.platformSuperAdmin, STAFF_TYPES.orgSuperAdmin, STAFF_TYPES.orgAdmin, STAFF_TYPES.orgStaff],
     },
     share: {
       type: Number,
@@ -61,6 +61,11 @@ const StaffSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Staff",
     },
+    role: {
+  type: String,
+  enum: ["platformSuperAdmin", "orgSuperAdmin", "orgAdmin", "orgStaff"],
+  default: null,
+},
   },
   {
     timestamps: true,

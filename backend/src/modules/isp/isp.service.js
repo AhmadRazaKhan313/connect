@@ -3,7 +3,7 @@ const { IspModel } = require("../../models");
 let ispService = {};
 
 /**
- * Ceate isp
+ * Create isp
  * @param {Object} ispBody
  * @returns {Promise<IspModel>}
  */
@@ -13,10 +13,12 @@ ispService.createIsp = async (ispBody) => {
 
 /**
  * Get All isps
+ * @param {ObjectId} organizationId
  * @returns {Promise<IspModel>}
  */
-ispService.getAllIsps = async () => {
-  return await IspModel.find({});
+ispService.getAllIsps = async (organizationId) => {
+  const filter = organizationId ? { organizationId } : {};
+  return await IspModel.find(filter);
 };
 
 /**

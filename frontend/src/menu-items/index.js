@@ -8,15 +8,45 @@ import isps from './isps';
 import staff from './staff';
 import users from './users';
 import extraIncome from './extra-income';
+import organizations from './organizations';
 
-// ==============================|| MENU ITEMS ||============================== //
+const PLATFORM_SUPER_ADMIN = [dashboard, organizations];
 
-const ADMIN = [dashboard, isps, staff, users, expenses, entries, invoices, extraIncome];
-const STAFF = [dashboard, isps, users, expenses, entries, invoices, extraIncome];
+const getFilteredMenu = (type, orgFeatures) => {
+    const isAdmin = type === STAFF_TYPES.admin || type === STAFF_TYPES.superadmin;
+    const menu = [dashboard];
 
+    // orgFeatures null ho (load nahi hui abhi) toh sab show karo
+    if (!orgFeatures) {
+        if (isAdmin) return [dashboard, isps, staff, users, expenses, entries, invoices, extraIncome];
+        return [dashboard, isps, users, entries];
+    }
+
+    if (orgFeatures?.ispManagement) menu.push(isps);
+    if (isAdmin && orgFeatures?.staffManagement) menu.push(staff);
+    menu.push(users);
+    if (isAdmin && orgFeatures?.expenses) menu.push(expenses);
+    menu.push(entries);
+    if (isAdmin && orgFeatures?.invoicing) menu.push(invoices);
+    if (isAdmin && orgFeatures?.extraIncome) menu.push(extraIncome);
+
+    return menu;
+};
+
+export const getMenuItems = (orgFeatures) => {
+    const role = jwt.getUser()?.role;
+    const type = jwt.getUser()?.type;
+
+    if (role === 'platformSuperAdmin') {
+        return PLATFORM_SUPER_ADMIN;
+    }
+
+    return getFilteredMenu(type, orgFeatures);
+};
+
+// default export — initial render ke liye (orgFeatures load hone se pehle)
 const menuItems = {
-    // items: [dashboard, pages, utilities, other]
-    items: jwt.getUser().type === STAFF_TYPES.admin ? ADMIN : STAFF
+    items: []
 };
 
 export default menuItems;

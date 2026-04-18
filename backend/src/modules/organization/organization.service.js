@@ -1,79 +1,70 @@
-const httpStatus = require("http-status");
-const OrganizationModel = require("./organization.model");
-const ApiError = require("../../utils/ApiError");
-
+const { OrganizationModel, StaffModel } = require("../../models");
+// const bcrypt = require("bcryptjs");
 let organizationService = {};
 
-/**
- * Create Organization
- * @param {Object} orgBody
- * @returns {Promise<OrganizationModel>}
- */
 organizationService.createOrganization = async (orgBody) => {
-  const isOrg = await OrganizationModel.findOne({ email: orgBody.email });
-  if (isOrg) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Organization already exists with this email"
-    );
-  }
-  return await OrganizationModel.create(orgBody);
+  const { adminUser, ...organizationData } = orgBody;
+
+  // 1.create Organization
+  const organization = await OrganizationModel.create(organizationData);
+
+  // 2. create OrgSuperAdmin user
+  // const hashedPassword = await bcrypt.hash(adminUser.password, 8);
+  await StaffModel.create({
+    fullname: adminUser.name,
+    email: adminUser.email,
+    password: adminUser.password,
+    mobile: adminUser.mobile,
+    cnic: adminUser.cnic,
+    address: adminUser.address,
+    type: adminUser.type,
+    share: adminUser.share || 0,
+    role: "orgSuperAdmin",
+    organizationId: organization._id,
+  });
+
+  return organization;
 };
 
-/**
- * Get All Organizations
- * @returns {Promise<OrganizationModel[]>}
- */
 organizationService.getAllOrganizations = async () => {
-  return await OrganizationModel.find();
+  return await OrganizationModel.find({});
 };
 
-/**
- * Get Organization By Id
- * @param {ObjectId} id
- * @returns {Promise<OrganizationModel>}
- */
 organizationService.getOrganizationById = async (id) => {
   return await OrganizationModel.findById(id);
 };
 
-/**
- * Update Organization
- * @param {ObjectId} id
- * @param {Object} updateBody
- * @returns {Promise<OrganizationModel>}
- */
+// for check email in controller
+organizationService.getOrganizationByEmail = async (email) => {
+  return await OrganizationModel.findOne({ email });
+};
+
+// for check subdomain in conroller
+organizationService.getOrganizationBySubdomain = async (subdomain) => {
+  return await OrganizationModel.findOne({ subdomain });
+};
+
+// for Controller updateOrganization calls
 organizationService.updateOrganization = async (id, updateBody) => {
-  const org = await OrganizationModel.findById(id);
-  if (!org) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Organization not found");
-  }
-  return await OrganizationModel.updateOne({ _id: id }, updateBody);
+  await OrganizationModel.updateOne({ _id: id }, updateBody);
+  return "Organization Updated";
 };
 
-/**
- * Delete Organization
- * @param {ObjectId} id
- * @returns {Promise<string>}
- */
-organizationService.deleteOrganization = async (id) => {
-  const org = await OrganizationModel.findById(id);
-  if (!org) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Organization not found");
-  }
-  await OrganizationModel.deleteOne({ _id: id });
-  return "Organization deleted";
-};
-
-/**
- * Update Organization Status
- * @param {ObjectId} id
- * @param {string} status
- * @returns {Promise<string>}
- */
+// Controller updateStatus calls
 organizationService.updateStatus = async (id, status) => {
   await OrganizationModel.updateOne({ _id: id }, { status });
-  return "Status updated";
+  return "Status Updated";
+};
+
+organizationService.updateOrganizationFeatures = async (id, features) => {
+  await OrganizationModel.updateOne({ _id: id }, { features });
+  return "Features Updated";
+};
+
+// Controller deleteOrganization call
+organizationService.deleteOrganization = async (id) => {
+  await OrganizationModel.deleteOne({ _id: id });
+  return "Organization Deleted";
 };
 
 module.exports = organizationService;
