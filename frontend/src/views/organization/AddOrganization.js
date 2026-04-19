@@ -20,7 +20,7 @@ function AddOrganization() {
         email: '',
         mobile: '',
         address: '',
-        subdomain: '',           // ✅ NEW
+        subdomain: '',           //  NEW
         primaryColor: '#1976d2',
         secondaryColor: '#424242',
         features: {
@@ -39,7 +39,7 @@ function AddOrganization() {
             mobile: '',
             cnic: '',
             address: '',
-            type: 'admin',
+           type: 'orgAdmin',
             share: 0
         }
     };
@@ -106,7 +106,7 @@ function AddOrganization() {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         label="Subdomain"
-                                        inputProps={{ pattern: '[a-z0-9-]+' }}
+                                        inputProps={{ pattern: '[a-z0-9\\-]+' }}
                                     />
                                     <FormHelperText>
                                         Sirf lowercase letters, numbers aur hyphen (-). Example: bahawalpur, multan-city

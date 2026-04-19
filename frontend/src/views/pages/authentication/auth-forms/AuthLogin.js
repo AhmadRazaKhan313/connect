@@ -76,10 +76,10 @@ const FirebaseLogin = ({ setOpenModal, ...others }) => {
                                    jwt.setIsLogin(true);
                                     setIsLoading(false);
                                     const role = res?.data?.user?.role;
-                                    if (role === 'platformSuperAdmin') {
-                                    navigate('/dashboard/all-organizations');
+                                   if (role === 'platformSuperAdmin') {
+                                     window.location.href = '/dashboard/all-organizations';
                                     } else {
-                                        navigate('/dashboard');
+                                     window.location.href = '/dashboard';
                                     }
                                 })
                                 .catch((err) => {

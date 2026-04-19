@@ -10,10 +10,12 @@ import users from './users';
 import extraIncome from './extra-income';
 import organizations from './organizations';
 
-const PLATFORM_SUPER_ADMIN = [dashboard, organizations];
+const PLATFORM_SUPER_ADMIN = [dashboard, organizations, isps, staff, users, expenses, entries, invoices, extraIncome];
 
-const getFilteredMenu = (type, orgFeatures) => {
-    const isAdmin = type === STAFF_TYPES.admin || type === STAFF_TYPES.superadmin;
+const getFilteredMenu = (type, role, orgFeatures) => {
+//    const isAdmin = type === STAFF_TYPES.orgAdmin || type === STAFF_TYPES.orgSuperAdmin;
+const isAdmin = type === 'orgAdmin' || type === 'orgSuperAdmin' || role === 'orgSuperAdmin';
+   console.log("check detail",jwt.getUser())
     const menu = [dashboard];
 
     // orgFeatures null ho (load nahi hui abhi) toh sab show karo
@@ -33,6 +35,7 @@ const getFilteredMenu = (type, orgFeatures) => {
     return menu;
 };
 
+
 export const getMenuItems = (orgFeatures) => {
     const role = jwt.getUser()?.role;
     const type = jwt.getUser()?.type;
@@ -41,7 +44,7 @@ export const getMenuItems = (orgFeatures) => {
         return PLATFORM_SUPER_ADMIN;
     }
 
-    return getFilteredMenu(type, orgFeatures);
+   return getFilteredMenu(type, role, orgFeatures);
 };
 
 // default export — initial render ke liye (orgFeatures load hone se pehle)

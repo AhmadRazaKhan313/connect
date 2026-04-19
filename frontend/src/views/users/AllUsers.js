@@ -15,8 +15,8 @@ import ModalReceipt from '../entries/ModalReceipt';
 import useAppContext from 'context/useAppContext';
 import { useNavigate } from 'react-router';
 
-function createData(id, sr, fullname, userId, cnic, mobile, email, address) {
-    return { id, sr, fullname, userId, cnic, mobile, email, address };
+function createData(id, sr, fullname, userId, cnic, mobile, email, address, organizationId) {
+    return { id, sr, fullname, userId, cnic, mobile, email, address, organizationId };
 }
 
 export default function AllUsers() {
@@ -28,8 +28,10 @@ export default function AllUsers() {
     const [errorMessage, setErrorMessage] = useState('');
     const [openModal, setOpenModal] = useState(false);
     const [idToDelete, setIdToDelete] = useState('');
+    const [organizations, setOrganizations] = useState([]);
 
     const navigate = useNavigate();
+    const isPlatformSuperAdmin = jwt.getUser()?.role === 'platformSuperAdmin';
 
     const { data, setData, filteredData, setFilteredData, setFilters } = useAppContext();
 
@@ -59,9 +61,21 @@ export default function AllUsers() {
         navigate('/dashboard/edit-user', { state: { user } });
     };
 
+    // Organization name dhundne ka helper
+    const getOrgName = (organizationId) => {
+        const org = organizations.find((o) => o.id === organizationId || o._id === organizationId);
+        return org ? org.name : '—';
+    };
+
     useEffect(() => {
         setFilters(['fullname', 'userId', 'cnic', 'mobile', 'email', 'address']);
         getAllUsers();
+        // platformSuperAdmin ke liye organizations load karo
+        if (isPlatformSuperAdmin) {
+            jwt.getAllOrganizations()
+                .then((res) => setOrganizations(res?.data || []))
+                .catch((err) => console.log(err));
+        }
     }, []);
 
     useEffect(() => {
@@ -76,7 +90,17 @@ export default function AllUsers() {
                 let rowsData = [];
                 res?.data?.map((item, index) =>
                     rowsData.push(
-                        createData(item?.id, index + 1, item?.fullname, item?.userId, item?.cnic, item?.mobile, item?.email, item?.address)
+                        createData(
+                            item?.id,
+                            index + 1,
+                            item?.fullname,
+                            item?.userId,
+                            item?.cnic,
+                            item?.mobile,
+                            item?.email,
+                            item?.address,
+                            item?.organizationId
+                        )
                     )
                 );
                 setData(rowsData);
@@ -124,11 +148,13 @@ export default function AllUsers() {
                                     <TableCell style={style}>Mobile</TableCell>
                                     <TableCell style={style}>Email</TableCell>
                                     <TableCell style={style}>Address</TableCell>
-                                    {/* {jwt.getUser()?.type === STAFF_TYPES.admin && ( */}
+                                    {/* Organization column — sirf platformSuperAdmin ko */}
+                                    {isPlatformSuperAdmin && (
+                                        <TableCell style={style}>Organization</TableCell>
+                                    )}
                                     <TableCell style={style} colSpan={2} sx={{ textAlign: 'center' }}>
                                         Action
                                     </TableCell>
-                                    {/* )} */}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -142,6 +168,10 @@ export default function AllUsers() {
                                             <TableCell>{row?.mobile}</TableCell>
                                             <TableCell>{row?.email}</TableCell>
                                             <TableCell>{row?.address}</TableCell>
+                                            {/* Organization name */}
+                                            {isPlatformSuperAdmin && (
+                                                <TableCell>{getOrgName(row?.organizationId)}</TableCell>
+                                            )}
                                             <TableCell>
                                                 <Button variant="contained" color="success" onClick={() => editUser(row)}>
                                                     Edit

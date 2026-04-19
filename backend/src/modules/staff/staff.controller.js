@@ -69,35 +69,35 @@ staffController.getAllPartners = catchAsync(async (req, res) => {
   }
   res.send(partners);
 });
-
 staffController.updateProfile = catchAsync(async (req, res) => {
   let updateBody = req?.body;
   const user = req?.user;
   const file = req?.file;
-  const key = `${user?.id || user?._id}`;
-  const params = {
-    Bucket: `${process.env.AWS_BUCKET_NAME}/staff-images`,
-    Key: key,
-    Body: file.buffer,
-    ContentType: file.mimetype,
-    // ACL: "public-read",
-  };
-  try {
-    const response = await s3.upload(params).promise();
-    updateBody.profileImage = response.Location;
-    const update = await staffService.updateProfile(user?.id, updateBody);
-    if (update) {
-      let staff = await staffService.getStaffById(user?.id);
-      staff.password = null;
-      res.send(staff);
-    } else {
-      throw new ApiError(httpStatus[404], "Something went wrong");
+
+  if (file) {
+    const key = `${user?.id || user?._id}`;
+    const params = {
+      Bucket: `${process.env.AWS_BUCKET_NAME}/staff-images`,
+      Key: key,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+    try {
+      const response = await s3.upload(params).promise();
+      updateBody.profileImage = response.Location;
+    } catch (error) {
+      console.error("S3 upload failed:", error);
+      
     }
-  } catch (error) {
-    console.error("error");
-    console.error(error);
-    throw new ApiError(500, "Failed to upload image");
+  }
+
+  const update = await staffService.updateProfile(user?.id, updateBody);
+  if (update) {
+    let staff = await staffService.getStaffById(user?.id);
+    staff.password = null;
+    res.send(staff);
+  } else {
+    throw new ApiError(httpStatus[404], "Something went wrong");
   }
 });
-
 module.exports = staffController;
