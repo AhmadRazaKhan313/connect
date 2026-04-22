@@ -1,5 +1,4 @@
 const allRoles = {
-  platformSuperAdmin: [],
   orgSuperAdmin: [],
   orgAdmin: [],
   orgStaff: [],

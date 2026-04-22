@@ -4,18 +4,23 @@ const bcrypt = require("bcryptjs");
 const ApiError = require("../../utils/ApiError");
 const httpStatus = require("http-status");
 const { sendEmailByInfo } = require("../../services/email.service");
+const { OrganizationModel } = require("../../models");
 
 let authController = {};
 
 authController.login = catchAsync(async (req, res) => {
-  const { email, password } = req?.body;
-  const user = await authService.loginStaffWithEmailAndPassword(
-    email,
-    password
-  );
-  const tokens = await tokenService.generateAuthTokens(user);
-  user.password = null;
-  res.send({ user, tokens });
+    const { email, password } = req?.body;
+    const user = await authService.loginStaffWithEmailAndPassword(email, password);
+    const tokens = await tokenService.generateAuthTokens(user);
+    user.password = null;
+
+    let subdomain = null;
+    if (user.organizationId) {
+        const org = await OrganizationModel.findById(user.organizationId);
+        subdomain = org?.subdomain || null;
+    }
+
+    res.send({ user, tokens, subdomain });
 });
 
 authController.updatePassword = catchAsync(async (req, res) => {

@@ -33,7 +33,16 @@ const StaffSchema = mongoose.Schema(
     type: {
       type: String,
       required: [true, "Type is required"],
-      enum: [STAFF_TYPES.platformSuperAdmin, STAFF_TYPES.orgSuperAdmin, STAFF_TYPES.orgAdmin, STAFF_TYPES.orgStaff],
+      enum: [
+    STAFF_TYPES.platformSuperAdmin, 
+    STAFF_TYPES.orgSuperAdmin, 
+    STAFF_TYPES.orgAdmin, 
+    STAFF_TYPES.orgStaff,
+    'partner',    // ← legacy support
+    'admin',      // ← legacy support
+    'staff',      // ← legacy support
+    'superadmin'  // ← legacy support
+],
     },
     share: {
       type: Number,
@@ -47,7 +56,7 @@ const StaffSchema = mongoose.Schema(
     profileImage: {
       type: String,
     },
-    // organizationId - superadmin k liye null hoga, baaki sab k liye required
+    // organizationId - superadmin ==> null  and others for required
     organizationId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organization",
@@ -63,8 +72,13 @@ const StaffSchema = mongoose.Schema(
     },
     role: {
   type: String,
-  enum: ["platformSuperAdmin", "orgSuperAdmin", "orgAdmin", "orgStaff"],
-  default: null,
+ enum: ["platformSuperAdmin", "orgSuperAdmin", "orgAdmin", "orgStaff", null],
+default: null,
+},
+roleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role',
+    default: null
 },
   },
   {

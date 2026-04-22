@@ -14,12 +14,12 @@ const verifyCallback =
         req.user = user;
 
         // set organizationId — subdomain check
-        if (user.role === "platformSuperAdmin") {
-          req.organizationId = req.subdomainOrgId || null;
-        } else {
-          // Baaki sab — apni organizationId
-          req.organizationId = user.organizationId;
-        }
+        // if (user.role === "platformSuperAdmin") {
+        //   req.organizationId = req.subdomainOrgId || null;
+        // } else {
+        //   // Baaki sab — apni organizationId
+        //   req.organizationId = user.organizationId;
+        // }
 
         if (requiredRights.length) {
           const userRights = roleRights.get(user.role);

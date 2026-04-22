@@ -15,6 +15,7 @@ userValidation.createUser = {
     mobile: Joi.string().custom(mobile).allow(""),
     address: Joi.string().required(),
     sendWelcomeMessage: Joi.boolean().required(),
+    organizationId: Joi.string().allow("").optional(), // ← ADD
   }),
 };
 
