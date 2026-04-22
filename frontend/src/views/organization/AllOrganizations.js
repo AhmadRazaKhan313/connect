@@ -38,7 +38,6 @@ export default function AllOrganizations() {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
         jwt.updateOrganizationStatus(id, newStatus)
             .then(() => {
-                // ✅ Fix: org._id use kiya
                 setOrganizations((prev) =>
                     prev.map((org) => (org.id === id ? { ...org, status: newStatus } : org))
                 );

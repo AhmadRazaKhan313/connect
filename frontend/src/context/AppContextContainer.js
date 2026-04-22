@@ -14,13 +14,14 @@ function AppContextContainer({ children }) {
     const [startDate, setStartDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
 
-    useEffect(() => {
-        const role = jwt.getUser()?.role;
-        if (role !== 'platformSuperAdmin') {
-            getSmsBalance();
-            loadOrgFeatures();
-        }
-    }, []);
+   useEffect(() => {
+    const role = jwt.getUser()?.role;
+    const token = jwt.getToken();
+    if (token && role !== 'platformSuperAdmin') {
+        getSmsBalance();
+        loadOrgFeatures();
+    }
+}, []);
 
     const getSmsBalance = async () => {
         jwt.getSmsBalance()

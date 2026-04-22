@@ -342,9 +342,12 @@ class JwtService {
   getOrganization(id) {
     return axios.get(`${this.jwtConfig.organizationEndpoint}/${id}`);
   }
+  // getOrganizationById(id) {
+  //   return axios.get(`${this.jwtConfig.organizationEndpoint}/${id}`);
+  // }
   getOrganizationById(id) {
     return axios.get(`${this.jwtConfig.organizationEndpoint}/${id}`);
-  }
+}
   
   updateOrganization(id, payload) {
     return axios.put(`${this.jwtConfig.organizationEndpoint}/${id}`, payload);

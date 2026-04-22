@@ -40,14 +40,19 @@ export const getMenuItems = (orgFeatures) => {
     const role = jwt.getUser()?.role;
     const type = jwt.getUser()?.type;
 
-    if (role === 'platformSuperAdmin') {
+    const hostname = window.location.hostname;
+    const subdomain = hostname.split('.')[0];
+
+    const MASTER_ORG_ID = '69e6ea81f25b8158cf1c62ac';
+    const isSuperOrg = jwt.getUser()?.organizationId === MASTER_ORG_ID;
+
+    if (isSuperOrg) {
         return PLATFORM_SUPER_ADMIN;
     }
 
-   return getFilteredMenu(type, role, orgFeatures);
+    return getFilteredMenu(type, role, orgFeatures);
 };
 
-// default export — initial render ke liye (orgFeatures load hone se pehle)
 const menuItems = {
     items: []
 };

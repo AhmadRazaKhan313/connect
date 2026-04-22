@@ -1,29 +1,28 @@
 // ─── Base URL Logic ───────────────────────────────────────────────────────────
 const getBaseUrl = () => {
-  const hostname = window.location.hostname; // e.g. bahawalpur.localhost
-  const parts = hostname.split(".");
+    const hostname = window.location.hostname;
+    // karachi.local → parts = ["karachi", "local"]
+    const parts = hostname.split(".");
 
-  const ignored = ["localhost", "www", "127", "api"];
+    const ignored = ["localhost", "local", "www", "127"];
 
-  // Subdomain detect
-  // Local:      bahawalpur.localhost  → parts = ["bahawalpur", "localhost"]
-  // Production: bahawalpur.connect.lodhran.com → parts.length > 2
-  const hasSubdomain =
-    parts.length >= 2 && !ignored.includes(parts[0]) && parts[0] !== hostname;
+    const hasSubdomain =
+        parts.length >= 2 && 
+        !ignored.includes(parts[0]) && 
+        parts[0] !== hostname;
 
-  if (hasSubdomain) {
-    if (hostname.includes("localhost")) {
-      // Local dev — bahawalpur.localhost:4000
-      return `http://${parts[1]}:4000/api/v1`;
-      // Backend will be localhost — subdomain on frontend
-    } else {
-      // Production — api.connect.lodhran.com
-      return `https://api.connect.lodhran.com/api/v1`;
+    if (hasSubdomain) {
+        if (hostname.includes(".local") || 
+            hostname.includes("localhost")) {
+            // Local — backend localhost:4000 pe hai
+            return `http://localhost:4000/api/v1`;
+        } else {
+            // Production
+            return `https://api.connectlodhran.com/api/v1`;
+        }
     }
-  }
 
-  // Default — no subdomain
-  return "http://localhost:4000/api/v1";
+    return "http://localhost:4000/api/v1";
 };
 
 const BASE_URL = getBaseUrl();
@@ -77,5 +76,4 @@ export default {
 
   // organization endpoint
   organizationEndpoint: `${BASE_URL}/organization`,
-  
 };

@@ -1,34 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
 import {
-    Avatar,
-    Box,
-    Chip,
-    ClickAwayListener,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Paper,
-    Popper,
-    Stack,
-    Typography
+    Avatar, Box, Chip, ClickAwayListener, List, ListItemButton,
+    ListItemIcon, ListItemText, Paper, Popper, Stack, Typography
 } from '@mui/material';
-
-// third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import User1 from 'assets/images/users/user-round.svg';
-
-// assets
 import { IconLogout, IconSettings, IconEdit, IconUserCircle } from '@tabler/icons';
 import jwt from 'jwtservice/jwtService';
 
@@ -46,35 +27,38 @@ const ProfileSection = () => {
 
     const [selectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
-    /**
-     * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-     * */
     const anchorRef = useRef(null);
+
     const handleLogout = async () => {
-        jwt.setIsLogin(false);
-        jwt.removeToken();
-        jwt.removeRefreshtoken();
-        jwt.removeUser();
-        navigate(0);
+        const hostname = window.location.hostname;
+        const subdomain = hostname === 'localhost' ? null : hostname.split('.')[0];
+
+        // Sab clear karo
+        localStorage.clear();
+
+        // localhost ki connect_ keys bhi clear karo
+        // (ye already clear ho gayi localStorage.clear() se)
+
+        if (subdomain) {
+            window.location.replace(`http://${subdomain}.localhost:3000/login`);
+        } else {
+            window.location.replace('http://localhost:3000/login');
+        }
     };
 
+
     const handleClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
-            return;
-        }
+        if (anchorRef.current && anchorRef.current.contains(event.target)) return;
         setOpen(false);
     };
 
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
+    const handleToggle = () => setOpen((prevOpen) => !prevOpen);
 
     const prevOpen = useRef(open);
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
             anchorRef.current.focus();
         }
-
         prevOpen.current = open;
     }, [open]);
 
@@ -94,13 +78,9 @@ const ProfileSection = () => {
                         borderColor: theme.palette.primary.main,
                         background: `${theme.palette.primary.main}!important`,
                         color: theme.palette.primary.light,
-                        '& svg': {
-                            stroke: theme.palette.primary.light
-                        }
+                        '& svg': { stroke: theme.palette.primary.light }
                     },
-                    '& .MuiChip-label': {
-                        lineHeight: 0
-                    }
+                    '& .MuiChip-label': { lineHeight: 0 }
                 }}
                 icon={
                     <Avatar
@@ -132,14 +112,7 @@ const ProfileSection = () => {
                 transition
                 disablePortal
                 popperOptions={{
-                    modifiers: [
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [0, 14]
-                            }
-                        }
-                    ]
+                    modifiers: [{ name: 'offset', options: { offset: [0, 14] } }]
                 }}
             >
                 {({ TransitionProps }) => (
@@ -168,12 +141,8 @@ const ProfileSection = () => {
                                                     minWidth: 300,
                                                     backgroundColor: theme.palette.background.paper,
                                                     borderRadius: '10px',
-                                                    [theme.breakpoints.down('md')]: {
-                                                        minWidth: '100%'
-                                                    },
-                                                    '& .MuiListItemButton-root': {
-                                                        mt: 0.5
-                                                    }
+                                                    [theme.breakpoints.down('md')]: { minWidth: '100%' },
+                                                    '& .MuiListItemButton-root': { mt: 0.5 }
                                                 }}
                                             >
                                                 <ListItemButton

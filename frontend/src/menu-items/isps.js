@@ -5,7 +5,7 @@ import { STAFF_TYPES } from 'utils/Constants';
 
 // ==============================|| EXTRA ISP MENU ITEMS ||============================== //
 let children = [];
-jwt.getUser()?.type === STAFF_TYPES.admin &&
+(jwt.getUser()?.type === 'orgAdmin' || jwt.getUser()?.type === 'orgSuperAdmin') &&
     children.push({
         id: 'add-isp',
         title: 'Add ISP',

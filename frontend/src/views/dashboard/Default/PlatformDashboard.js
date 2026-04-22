@@ -10,9 +10,6 @@ import {
     TableRow,
     Chip,
     Button,
-    FormControl,
-    OutlinedInput,
-    InputLabel,
     Alert
 } from '@mui/material';
 import { gridSpacing } from 'store/constant';
@@ -72,6 +69,15 @@ const PlatformDashboard = () => {
             })
             .catch((err) => alert(err?.response?.data?.message));
     };
+    const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this organization?')) {
+        jwt.deleteOrganization(id)
+            .then(() => {
+                setOrganizations((prev) => prev.filter((org) => org.id !== id));
+            })
+            .catch((err) => alert(err?.response?.data?.message));
+    }
+};
 
     // Stats
     const totalOrgs = organizations.length;
@@ -95,7 +101,7 @@ const PlatformDashboard = () => {
 
                             </Grid>
                             <Grid item sm={12} xs={12} md={4}>
-                                <OrgStatCard isLoading={isLoading} title="Inactive Organizations" total={inactiveOrgs} />
+                                <OrgStatCard isLoading={isLoading} title="Inactive Organizations" total={inactiveOrgs} /> 
                             </Grid>
                         </Grid>
                     </Grid>
@@ -194,6 +200,15 @@ const PlatformDashboard = () => {
                                                         onClick={() => navigate(`/dashboard/edit-organization/${org.id}`)}
                                                     >
                                                         Edit
+                                                    </Button>
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="error"
+                                                        onClick={() => handleDelete(org.id)}
+                                                        sx={{ mr: 1, mb: 1 }}
+                                                    >
+                                                         Delete
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>

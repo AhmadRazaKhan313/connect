@@ -1,36 +1,19 @@
 import { useState } from 'react';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
 import {
-    Alert,
-    Box,
-    FormControl,
-    FormHelperText,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-    Stack,
-    Typography
+    Alert, Box, FormControl, FormHelperText, IconButton,
+    InputAdornment, InputLabel, OutlinedInput, Stack, Typography
 } from '@mui/material';
-
-// third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-
-// project imports
+import axios from 'axios';
 import useScriptRef from 'hooks/useScriptRef';
-
-// assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import jwt from 'jwtservice/jwtService';
 import { useNavigate } from 'react-router';
 import { THEME_COLOR_DARK } from 'utils/Constants';
 import SimpleButton from 'ui-component/SimpleButton';
-
-// ============================|| FIREBASE - LOGIN ||============================ //
 
 const FirebaseLogin = ({ setOpenModal, ...others }) => {
     const theme = useTheme();
@@ -41,21 +24,13 @@ const FirebaseLogin = ({ setOpenModal, ...others }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
-
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
+    const handleClickShowPassword = () => setShowPassword(!showPassword);
+    const handleMouseDownPassword = (event) => event.preventDefault();
 
     return (
         <>
             <Formik
-                initialValues={{
-                    email: '',
-                    password: ''
-                }}
+                initialValues={{ email: '', password: '' }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     password: Yup.string().max(255).required('Password is required')
@@ -66,26 +41,50 @@ const FirebaseLogin = ({ setOpenModal, ...others }) => {
                             setStatus({ success: true });
                             setSubmitting(false);
                             setIsLoading(true);
+
                             jwt.login(values)
                                 .then((res) => {
-                                    setIsError(false);
-                                    setErrorMessage('');
-                                    jwt.setToken(res.data.tokens.access.token);
-                                    jwt.setRefreshToken(res.data.tokens.refresh.token);
-                                    jwt.setUser({ ...res?.data?.user, time: Date.now() });
-                                   jwt.setIsLogin(true);
-                                    setIsLoading(false);
-                                    const role = res?.data?.user?.role;
-                                   if (role === 'platformSuperAdmin') {
-                                     window.location.href = '/dashboard/all-organizations';
+                                    const token = res.data.tokens.access.token;
+                                    const refreshToken = res.data.tokens.refresh.token;
+                                    const user = res?.data?.user;
+                                    const orgId = user?.organizationId;
+
+                                    if (orgId) {
+                                        axios.get(`http://localhost:4000/api/v1/organization/${orgId}`, {
+                                            headers: { Authorization: `Bearer ${token}` }
+                                        })
+                                        .then((orgRes) => {
+                                            const subdomain = orgRes?.data?.subdomain;
+                                            if (subdomain) {
+                                                // localhost ki storage mein bhi save karo
+                                                // taake localhost:3000 pe wapas aa sakein
+                                                // localStorage.setItem('connect_last_subdomain', subdomain);
+                                                // localStorage.setItem('connect_isLogin', 'true');
+                                                
+
+                                                const redirectUrl = `http://${subdomain}.localhost:3000/auth-redirect?token=${token}&refreshToken=${refreshToken}&user=${encodeURIComponent(JSON.stringify(user))}`;
+                                                window.location.replace(redirectUrl);
+                                            } else {
+                                                setIsLoading(false);
+                                                setIsError(true);
+                                                setErrorMessage('Subdomain not found');
+                                            }
+                                        })
+                                        .catch(() => {
+                                            setIsLoading(false);
+                                            setIsError(true);
+                                            setErrorMessage('Organization not found');
+                                        });
                                     } else {
-                                     window.location.href = '/dashboard';
+                                        setIsLoading(false);
+                                        setIsError(true);
+                                        setErrorMessage('No organization assigned');
                                     }
                                 })
                                 .catch((err) => {
-                                    setErrorMessage(err?.response?.data?.message);
-                                    setIsError(true);
                                     setIsLoading(false);
+                                    setIsError(true);
+                                    setErrorMessage(err?.response?.data?.message || 'Login failed');
                                 });
                         }
                     } catch (err) {
@@ -172,7 +171,6 @@ const FirebaseLogin = ({ setOpenModal, ...others }) => {
                                 <FormHelperText error>{errors.submit}</FormHelperText>
                             </Box>
                         )}
-
                         <Box sx={{ mt: 2 }}>
                             <SimpleButton isValid={!isValid || isLoading} title="Sign In" />
                         </Box>

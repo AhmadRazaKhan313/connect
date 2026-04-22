@@ -14,6 +14,7 @@ import PartnerGrandSummaryCard from './PartnerGrandSummaryCard';
 import { STAFF_TYPES } from 'utils/Constants';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
+ const MASTER_ORG_ID = '69e6ea81f25b8158cf1c62ac';
 
 const MyDivider = () => {
     return (
@@ -43,15 +44,14 @@ const Dashboard = () => {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, index) => startYear + index);
 
-    // ─── platformSuperAdmin check — hooks ke baad, useEffect se pehle ───
-    const role = jwt.getUser()?.role;
+ 
 
     useEffect(() => {
-        if (role === 'platformSuperAdmin') return; // summary call mat karo
-        if (selectedMonth && selectedYear) {
-            getSummary(selectedMonth, selectedYear);
-        }
-    }, [selectedMonth, selectedYear]);
+    if (jwt.getUser()?.organizationId === MASTER_ORG_ID) return;
+    if (selectedMonth && selectedYear) {
+        getSummary(selectedMonth, selectedYear);
+    }
+}, [selectedMonth, selectedYear]);
 
     const getSummary = (month, year) => {
         setLoading(true);
@@ -75,10 +75,9 @@ const Dashboard = () => {
             });
     };
 
-    // ─── platformSuperAdmin ko alag dashboard dikhao ───
-    if (role === 'platformSuperAdmin') {
-        return <PlatformDashboard />;
-    }
+const MASTER_ORG_ID = '69e6ea81f25b8158cf1c62ac';
+const isMasterOrg = jwt.getUser()?.organizationId === MASTER_ORG_ID;
+if (isMasterOrg) return <PlatformDashboard />;
 
     return (
         <Grid container spacing={gridSpacing}>
