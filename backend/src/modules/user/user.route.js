@@ -1,46 +1,34 @@
-const express = require("express");
-const auth = require("../../middlewares/auth");
-const validate = require("../../middlewares/validate");
-const userValidation = require("./user.validation");
-const userController = require("./user.controller");
+const express = require('express');
+const auth = require('../../middlewares/auth');
+const validate = require('../../middlewares/validate');
+const userValidation = require('./user.validation');
+const userController = require('./user.controller');
 
 const router = express.Router();
 
 router
-  .route("/")
-  .post(auth(), validate(userValidation.createUser), userController.createUser)
-  .get(
-    auth(),
-    validate(userValidation.getAllUsers),
-    userController.getAllUsers
-  );
+    .route('/')
+    .post(auth('user.create'), validate(userValidation.createUser), userController.createUser)
+    .get(auth('user.view'), validate(userValidation.getAllUsers), userController.getAllUsers);
 
 router
-  .route("/:id")
-  .get(auth(), validate(userValidation.getUser), userController.getUser)
-  .patch(
-    auth(),
-    validate(userValidation.updateUser),
-    userController.updateUserById
-  )
-  .delete(
-    auth(),
-    validate(userValidation.getUser),
-    userController.deleteUserById
-  );
+    .route('/:id')
+    .get(auth('user.view'), validate(userValidation.getUser), userController.getUser)
+    .patch(auth('user.edit'), validate(userValidation.updateUser), userController.updateUserById)
+    .delete(auth('user.delete'), validate(userValidation.getUser), userController.deleteUserById);
 
 router.post(
-  "/send-custom-message",
-  auth(),
-  validate(userValidation.sendCustomMessage),
-  userController.sendCustomMessage
+    '/send-custom-message',
+    auth('user.view'),
+    validate(userValidation.sendCustomMessage),
+    userController.sendCustomMessage
 );
 
 router.post(
-  "/autocomplete",
-  auth(),
-  validate(userValidation.getAutoCompleteUsers),
-  userController.getAutoCompleteUsers
+    '/autocomplete',
+    auth('user.view'),
+    validate(userValidation.getAutoCompleteUsers),
+    userController.getAutoCompleteUsers
 );
 
 module.exports = router;

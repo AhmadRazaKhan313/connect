@@ -19,7 +19,7 @@ function EditOrganization() {
 
     const [initialValues, setInitialValues] = useState(null);
 
-    // ─── Existing org data load karo ───────────────────────────────────────────
+    // ─── Existing org data  ───────────────────────────────────────────
     useEffect(() => {
         jwt.getOrganization(id)
             .then((res) => {
@@ -58,7 +58,7 @@ function EditOrganization() {
 
         const { features, ...orgData } = values;
 
-        // Pehle org info update karo, phir features
+    
         jwt.updateOrganization(id, orgData)
             .then(() => jwt.updateOrganizationFeatures(id, features))
             .then(() => {

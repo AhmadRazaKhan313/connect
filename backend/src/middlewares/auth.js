@@ -1,57 +1,73 @@
-const passport = require("passport");
-const httpStatus = require("http-status");
-const ApiError = require("../utils/ApiError");
-const { roleRights } = require("../config/roles");
+const passport = require('passport');
+const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
+const roleService = require('../modules/role/role.service');
 
-const verifyCallback =
-  (req, resolve, reject, requiredRights) => async (err, user, info) => {
+const MASTER_ORG_ID = '69e6ea81f25b8158cf1c62ac';
+
+const verifyCallback = (req, resolve, reject, requiredPermissions) => async (err, user, info) => {
     if (err || info || !user) {
-      return reject(
-        new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate")
-      );
-    } else {
-      try {
+        return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+    }
+
+    try {
         req.user = user;
+        req.organizationId = user.organizationId || null;
 
-        // set organizationId — subdomain check
-        // if (user.role === "platformSuperAdmin") {
-        //   req.organizationId = req.subdomainOrgId || null;
-        // } else {
-        //   // Baaki sab — apni organizationId
-        //   req.organizationId = user.organizationId;
-        // }
+        // Master admin check
+        const isMasterAdmin = user.organizationId?.toString() === MASTER_ORG_ID
+            && (user.role === 'orgSuperAdmin' || user.type === 'orgSuperAdmin');
 
-        if (requiredRights.length) {
-          const userRights = roleRights.get(user.role);
-          const hasRequiredRights = requiredRights.every((requiredRight) =>
-            userRights.includes(requiredRight)
-          );
-          if (!hasRequiredRights && req.params.userId !== user.id) {
-            return reject(new ApiError(httpStatus.FORBIDDEN, "Forbidden"));
-          }
+        // Master admin — no org filter, full access
+        if (isMasterAdmin) {
+            req.organizationId = null;
+            return resolve();
+        }
+
+        if (requiredPermissions.length) {
+            // orgAdmin or orgSuperAdmin — full access within their org
+            if (
+                user.role === 'orgAdmin' ||
+                user.role === 'orgSuperAdmin' ||
+                user.type === 'orgAdmin' ||
+                user.type === 'orgSuperAdmin' ||
+                user.type === 'admin' ||
+                user.type === 'superadmin'
+            ) return resolve();
+
+            // orgStaff — check roleId permissions
+            if (user.roleId) {
+                const role = await roleService.getRoleById(user.roleId);
+                if (role) {
+                    const hasPermission = requiredPermissions.every(p =>
+                        role.permissions.includes(p)
+                    );
+                    if (!hasPermission) {
+                        return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden — insufficient permissions'));
+                    }
+                    return resolve();
+                }
+            }
+
+            return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden — no role assigned'));
         }
 
         resolve();
-      } catch (err) {
-        return reject(
-          new ApiError(httpStatus.FORBIDDEN, "Error: " + err.message)
-        );
-      }
+    } catch (err) {
+        return reject(new ApiError(httpStatus.FORBIDDEN, 'Error: ' + err.message));
     }
-  };
+};
 
-const auth =
-  (...requiredRights) =>
-    async (req, res, next) => {
-      return new Promise((resolve, reject) => {
+const auth = (...requiredPermissions) => async (req, res, next) => {
+    return new Promise((resolve, reject) => {
         passport.authenticate(
-          "jwt",
-          { session: false },
-          verifyCallback(req, resolve, reject, requiredRights)
+            'jwt',
+            { session: false },
+            verifyCallback(req, resolve, reject, requiredPermissions)
         )(req, res, next);
-      })
+    })
         .then(() => next())
         .catch((err) => next(err));
-    };
+};
 
 module.exports = auth;

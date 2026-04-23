@@ -50,7 +50,7 @@ export default function AllOrganizations() {
         <Paper sx={{ width: '100%', overflow: 'hidden', mt: 4 }}>
             <Button
                 variant="contained"
-                sx={{ m: 2, backgroundColor: THEME_COLOR_LIGHT }}
+                sx={{ m: 2, backgroundColor: THEME_COLOR_LIGHT, color: 'white' }}
                 onClick={() => navigate('/dashboard/add-organization')}
             >
                 Add Organization

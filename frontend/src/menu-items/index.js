@@ -9,9 +9,9 @@ import staff from './staff';
 import users from './users';
 import extraIncome from './extra-income';
 import organizations from './organizations';
+import roles from './roles';
 
-const PLATFORM_SUPER_ADMIN = [dashboard, organizations, isps, staff, users, expenses, entries, invoices, extraIncome];
-
+const PLATFORM_SUPER_ADMIN = [dashboard, organizations, isps, staff, users, expenses, entries, invoices, extraIncome, roles];
 const getFilteredMenu = (type, role, orgFeatures) => {
 //    const isAdmin = type === STAFF_TYPES.orgAdmin || type === STAFF_TYPES.orgSuperAdmin;
 const isAdmin = type === 'orgAdmin' || type === 'orgSuperAdmin' || role === 'orgSuperAdmin';
@@ -20,7 +20,13 @@ const isAdmin = type === 'orgAdmin' || type === 'orgSuperAdmin' || role === 'org
 
     // orgFeatures null ho (load nahi hui abhi) toh sab show karo
     if (!orgFeatures) {
-        if (isAdmin) return [dashboard, isps, staff, users, expenses, entries, invoices, extraIncome];
+       // orgFeatures null wali condition mein:
+if (isAdmin) return [dashboard, isps, staff, users, expenses, entries, invoices, extraIncome, roles];
+
+
+if (isAdmin && orgFeatures?.invoicing) menu.push(invoices);
+if (isAdmin) menu.push(roles); 
+if (isAdmin && orgFeatures?.extraIncome) menu.push(extraIncome);
         return [dashboard, isps, users, entries];
     }
 

@@ -41,9 +41,9 @@ userService.getUserByUserId = async (userId) => {
  * @returns {Promise<UserModel>}
  */
 userService.getAllUsers = async (organizationId) => {
-  const filter = {};
-  if (organizationId) filter.organizationId = organizationId;
-  return UserModel.find(filter).sort({ userId: "asc" });
+    const filter = {};
+    if (organizationId) filter.organizationId = organizationId;
+    return UserModel.find(filter).sort({ userId: 'asc' });
 };
 
 /**

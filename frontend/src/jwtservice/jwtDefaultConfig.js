@@ -14,7 +14,7 @@ const getBaseUrl = () => {
     if (hasSubdomain) {
         if (hostname.includes(".local") || 
             hostname.includes("localhost")) {
-            // Local — backend localhost:4000 pe hai
+            // Local — backend localhost:4000 
             return `http://localhost:4000/api/v1`;
         } else {
             // Production
@@ -76,4 +76,8 @@ export default {
 
   // organization endpoint
   organizationEndpoint: `${BASE_URL}/organization`,
+
+ //role endpoint
+  roleEndpoint: `${BASE_URL}/role`,
+  
 };

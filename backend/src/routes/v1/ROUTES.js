@@ -10,6 +10,7 @@ const summaryRoute = require("../../modules/summary/summary.route");
 const smsSendingRoute = require("../../modules/sms-sending/smsSending.route");
 const extraIncomeRoute = require("../../modules/extra-income/extra-income.route");
 const organizationRoute = require("../../modules/organization/organization.route");
+const roleRoute = require('../../modules/role/role.route');
 
 const ROUTES = [
   {
@@ -20,6 +21,10 @@ const ROUTES = [
     path: "/organization",
     route: organizationRoute,
   },
+  {
+    path: '/role',
+    route: roleRoute,
+},
   {
     path: "/isp",
     route: ispRoute,

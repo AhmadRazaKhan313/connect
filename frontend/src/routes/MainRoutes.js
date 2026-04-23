@@ -39,6 +39,12 @@ const CompletedExtraIncomes = Loadable(lazy(() => import('views/extra-income/Com
 const PendingExtraIncomes = Loadable(lazy(() => import('views/extra-income/PendingExtraIncomes')));
 const EditExtraIncome = Loadable(lazy(() => import('views/extra-income/EditExtraIncome')));
 const NotFound = Loadable(lazy(() => import('views/error/NotFound')));
+const AllRoles = Loadable(lazy(() => import('views/roles/AllRoles')));
+const AddRole = Loadable(lazy(() => import('views/roles/AddRole')));
+const EditRole = Loadable(lazy(() => import('views/roles/EditRole')));
+
+
+
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -86,7 +92,10 @@ const MainRoutes = {
         { path: '/dashboard/add-organization', element: checkLogin(<AddOrganization />) },
         { path: '/dashboard/all-organizations', element: checkLogin(<AllOrganizations />) },
         { path: '/dashboard/edit-organization/:id', element: checkLogin(<EditOrganization />) },
-        { path: '*', element: checkLogin(<NotFound />) }
+        { path: '*', element: checkLogin(<NotFound />) },
+        { path: '/dashboard/all-roles', element: checkLogin(<AllRoles />) },
+        { path: '/dashboard/add-role', element: checkLogin(<AddRole />) },
+        { path: '/dashboard/edit-role/:id', element: checkLogin(<EditRole />) },
     ]
 };
 

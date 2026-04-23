@@ -364,6 +364,28 @@ class JwtService {
   deleteOrganization(id) {
     return axios.delete(`${this.jwtConfig.organizationEndpoint}/${id}`);
   }
+  getAllRoles() { 
+    return axios.get(this.jwtConfig.roleEndpoint);
+  }
+  createRole(payload) { 
+    return axios.post(this.jwtConfig.roleEndpoint, payload); 
+  }
+  deleteRole(id) { 
+    return axios.delete(`${this.jwtConfig.roleEndpoint}/${id}`); 
+  }
+  getRoleById(id) { 
+    return axios.get(`${this.jwtConfig.roleEndpoint}/${id}`); 
+  }
+  updateRole(id, payload) { 
+    return axios.put(`${this.jwtConfig.roleEndpoint}/${id}`, payload); 
+  }
+  // ──── Role Methods ────────────────────────────────────────
+
+getAllRoles() { return axios.get(this.jwtConfig.roleEndpoint); }
+createRole(payload) { return axios.post(this.jwtConfig.roleEndpoint, payload); }
+getRoleById(id) { return axios.get(`${this.jwtConfig.roleEndpoint}/${id}`); }
+updateRole(id, payload) { return axios.put(`${this.jwtConfig.roleEndpoint}/${id}`, payload); }
+deleteRole(id) { return axios.delete(`${this.jwtConfig.roleEndpoint}/${id}`); }
 }
 
 const jwt = new JwtService();
