@@ -10,15 +10,18 @@ import {
     TableRow,
     Chip,
     Button,
-    Alert
+    Alert,
+    Box,
+    IconButton,
+    Tooltip,
+    Typography
 } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import jwt from 'jwtservice/jwtService';
 import { useNavigate } from 'react-router';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import OrgStatCard from './OrgStatCard';
-
-// ==============================|| PLATFORM SUPER ADMIN DASHBOARD ||============================== //
+import { IconEdit, IconTrash, IconToggleLeft, IconToggleRight } from '@tabler/icons';
 
 const MyDivider = () => (
     <div
@@ -39,7 +42,7 @@ const PlatformDashboard = () => {
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const style = { backgroundColor: THEME_COLOR_LIGHT, color: 'white' };
+    const { tableHeaderStyle: style, primaryColor } = useOrgTheme();
 
     useEffect(() => {
         loadOrganizations();
@@ -69,17 +72,17 @@ const PlatformDashboard = () => {
             })
             .catch((err) => alert(err?.response?.data?.message));
     };
-    const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this organization?')) {
-        jwt.deleteOrganization(id)
-            .then(() => {
-                setOrganizations((prev) => prev.filter((org) => org.id !== id));
-            })
-            .catch((err) => alert(err?.response?.data?.message));
-    }
-};
 
-    // Stats
+    const handleDelete = (id) => {
+        if (window.confirm('Are you sure you want to delete this organization?')) {
+            jwt.deleteOrganization(id)
+                .then(() => {
+                    setOrganizations((prev) => prev.filter((org) => org.id !== id));
+                })
+                .catch((err) => alert(err?.response?.data?.message));
+        }
+    };
+
     const totalOrgs = organizations.length;
     const activeOrgs = organizations.filter((o) => o.status === 'active').length;
     const inactiveOrgs = organizations.filter((o) => o.status === 'inactive').length;
@@ -93,15 +96,13 @@ const PlatformDashboard = () => {
                     <Grid item xs={12}>
                         <Grid container spacing={2}>
                             <Grid item sm={12} xs={12} md={4}>
-                               <OrgStatCard isLoading={isLoading} title="Total Organizations" total={totalOrgs} />
-
+                                <OrgStatCard isLoading={isLoading} title="Total Organizations" total={totalOrgs} />
                             </Grid>
                             <Grid item sm={12} xs={12} md={4}>
-                            <OrgStatCard isLoading={isLoading} title="Active Organizations" total={activeOrgs} />
-
+                                <OrgStatCard isLoading={isLoading} title="Active Organizations" total={activeOrgs} />
                             </Grid>
                             <Grid item sm={12} xs={12} md={4}>
-                                <OrgStatCard isLoading={isLoading} title="Inactive Organizations" total={inactiveOrgs} /> 
+                                <OrgStatCard isLoading={isLoading} title="Inactive Organizations" total={inactiveOrgs} />
                             </Grid>
                         </Grid>
                     </Grid>
@@ -112,13 +113,19 @@ const PlatformDashboard = () => {
                     <Grid item xs={12}>
                         {isError && <Alert severity="error">{errorMessage}</Alert>}
                         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                            <Button
-                                variant="contained"
-                                sx={{ m: 2, backgroundColor: THEME_COLOR_LIGHT }}
-                                onClick={() => navigate('/dashboard/add-organization')}
-                            >
-                                + Add Organization
-                            </Button>
+
+                            {/* Header */}
+                            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="h3">All Organizations</Typography>
+                                <Button
+                                    variant="contained"
+                                    sx={{ backgroundColor: primaryColor, color: 'white', '&:hover': { backgroundColor: primaryColor, opacity: 0.9 } }}
+                                    onClick={() => navigate('/dashboard/add-organization')}
+                                >
+                                    + Add Organization
+                                </Button>
+                            </Box>
+
                             {isLoading && <h3 style={{ padding: '16px' }}>Loading...</h3>}
                             <TableContainer>
                                 <Table stickyHeader>
@@ -130,9 +137,8 @@ const PlatformDashboard = () => {
                                             <TableCell style={style}>Mobile</TableCell>
                                             <TableCell style={style}>Subdomain</TableCell>
                                             <TableCell style={style}>Color</TableCell>
-                                            <TableCell style={style}>Features</TableCell>
                                             <TableCell style={style}>Status</TableCell>
-                                            <TableCell style={style}>Actions</TableCell>
+                                            <TableCell style={style} align="center">Actions</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -153,24 +159,7 @@ const PlatformDashboard = () => {
                                                             backgroundColor: org.primaryColor || '#1976d2',
                                                             border: '1px solid #ccc'
                                                         }} />
-                                                        <span>{org.primaryColor || '#1976d2'}</span>
-                                                    </div>
-                                                </TableCell>
-
-                                                {/* Features chips */}
-                                                <TableCell>
-                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                                        {org.features && Object.entries(org.features).map(([key, val]) => (
-                                                            val ? (
-                                                                <Chip
-                                                                    key={key}
-                                                                    label={key}
-                                                                    size="small"
-                                                                    color="primary"
-                                                                    variant="outlined"
-                                                                />
-                                                            ) : null
-                                                        ))}
+                                                       <span>{org.primaryColor ? org.primaryColor.replace('#', '') : '1976d2'}</span>
                                                     </div>
                                                 </TableCell>
 
@@ -183,33 +172,40 @@ const PlatformDashboard = () => {
                                                     />
                                                 </TableCell>
 
-                                                {/* Actions */}
-                                                <TableCell>
-                                                    <Button
-                                                        size="small"
-                                                        variant="outlined"
-                                                        color={org.status === 'active' ? 'error' : 'success'}
-                                                        onClick={() => handleStatusToggle(org.id, org.status)}
-                                                        sx={{ mr: 1, mb: 1 }}
-                                                    >
-                                                        {org.status === 'active' ? 'Deactivate' : 'Activate'}
-                                                    </Button>
-                                                    <Button
-                                                        size="small"
-                                                        variant="outlined"
-                                                        onClick={() => navigate(`/dashboard/edit-organization/${org.id}`)}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        size="small"
-                                                        variant="outlined"
-                                                        color="error"
-                                                        onClick={() => handleDelete(org.id)}
-                                                        sx={{ mr: 1, mb: 1 }}
-                                                    >
-                                                         Delete
-                                                    </Button>
+                                                {/* Actions — icons */}
+                                                <TableCell align="center">
+                                                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                                        <Tooltip title="Edit">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => navigate(`/dashboard/edit-organization/${org.id}`)}
+                                                                sx={{ color: primaryColor }}
+                                                            >
+                                                                <IconEdit size={18} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title={org.status === 'active' ? 'Deactivate' : 'Activate'}>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleStatusToggle(org.id, org.status)}
+                                                                sx={{ color: org.status === 'active' ? primaryColor : '#9e9e9e' }}
+                                                            >
+                                                                {org.status === 'active'
+                                                                    ? <IconToggleRight size={18} />
+                                                                    : <IconToggleLeft size={18} />
+                                                                }
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Delete">
+                                                            <IconButton
+                                                                size="small"
+                                                                color="error"
+                                                                onClick={() => handleDelete(org.id)}
+                                                            >
+                                                                <IconTrash size={18} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

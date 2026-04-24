@@ -9,7 +9,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import jwt from 'jwtservice/jwtService';
 import { useNavigate } from 'react-router';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import PERMISSIONS from 'utils/Permissions';
 import SimpleButton from 'ui-component/SimpleButton';
 
@@ -26,7 +26,7 @@ export default function AddRole() {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-
+    const { primaryColor } = useOrgTheme();
     const handleGroupSelectAll = (group, checked, setFieldValue, values) => {
         const groupKeys = groupedPermissions[group].map((p) => p.key);
         if (checked) {
@@ -108,7 +108,7 @@ export default function AddRole() {
                                                     checked={allSelected}
                                                     indeterminate={someSelected && !allSelected}
                                                     onChange={(e) => handleGroupSelectAll(group, e.target.checked, setFieldValue, values)}
-                                                    sx={{ color: THEME_COLOR_LIGHT, '&.Mui-checked': { color: THEME_COLOR_LIGHT } }}
+                                                    sx={{ color: primaryColor, '&.Mui-checked': { color: primaryColor } }}
                                                 />
                                                 <Typography fontWeight="bold" variant="subtitle1">
                                                     {group}
@@ -130,7 +130,7 @@ export default function AddRole() {
                                                                     setFieldValue('permissions', values.permissions.filter((p) => p !== perm.key));
                                                                 }
                                                             }}
-                                                            sx={{ color: THEME_COLOR_LIGHT, '&.Mui-checked': { color: THEME_COLOR_LIGHT } }}
+                                                            sx={{ color: primaryColor, '&.Mui-checked': { color: primaryColor } }}
                                                         />
                                                     }
                                                     label={perm.label}

@@ -1,5 +1,4 @@
 import jwt from 'jwtservice/jwtService';
-import { STAFF_TYPES } from 'utils/Constants';
 import dashboard from './dashboard';
 import entries from './entries';
 import expenses from './expenses';
@@ -11,22 +10,18 @@ import extraIncome from './extra-income';
 import organizations from './organizations';
 import roles from './roles';
 
-const PLATFORM_SUPER_ADMIN = [dashboard, organizations, isps, staff, users, expenses, entries, invoices, extraIncome, roles];
+const MASTER_ORG_ID = '69e6ea81f25b8158cf1c62ac';
+
+const PLATFORM_SUPER_ADMIN = [dashboard, organizations, roles, isps, staff, users, expenses, entries, invoices, extraIncome];
+
 const getFilteredMenu = (type, role, orgFeatures) => {
-//    const isAdmin = type === STAFF_TYPES.orgAdmin || type === STAFF_TYPES.orgSuperAdmin;
-const isAdmin = type === 'orgAdmin' || type === 'orgSuperAdmin' || role === 'orgSuperAdmin';
-   console.log("check detail",jwt.getUser())
+    const isAdmin = type === 'orgAdmin' || type === 'orgSuperAdmin' || role === 'orgSuperAdmin';
+
     const menu = [dashboard];
 
-    // orgFeatures null ho (load nahi hui abhi) toh sab show karo
+    // orgFeatures null ho toh sab show karo
     if (!orgFeatures) {
-       // orgFeatures null wali condition mein:
-if (isAdmin) return [dashboard, isps, staff, users, expenses, entries, invoices, extraIncome, roles];
-
-
-if (isAdmin && orgFeatures?.invoicing) menu.push(invoices);
-if (isAdmin) menu.push(roles); 
-if (isAdmin && orgFeatures?.extraIncome) menu.push(extraIncome);
+        if (isAdmin) return [dashboard, isps, staff, users, expenses, entries, invoices, extraIncome, roles];
         return [dashboard, isps, users, entries];
     }
 
@@ -37,19 +32,14 @@ if (isAdmin && orgFeatures?.extraIncome) menu.push(extraIncome);
     menu.push(entries);
     if (isAdmin && orgFeatures?.invoicing) menu.push(invoices);
     if (isAdmin && orgFeatures?.extraIncome) menu.push(extraIncome);
+    if (isAdmin) menu.push(roles);
 
     return menu;
 };
 
-
 export const getMenuItems = (orgFeatures) => {
     const role = jwt.getUser()?.role;
     const type = jwt.getUser()?.type;
-
-    const hostname = window.location.hostname;
-    const subdomain = hostname.split('.')[0];
-
-    const MASTER_ORG_ID = '69e6ea81f25b8158cf1c62ac';
     const isSuperOrg = jwt.getUser()?.organizationId === MASTER_ORG_ID;
 
     if (isSuperOrg) {
@@ -59,8 +49,5 @@ export const getMenuItems = (orgFeatures) => {
     return getFilteredMenu(type, role, orgFeatures);
 };
 
-const menuItems = {
-    items: []
-};
-
+const menuItems = { items: [] };
 export default menuItems;

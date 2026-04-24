@@ -1,11 +1,66 @@
-import { Alert, FormControl, FormHelperText, Grid, InputLabel, OutlinedInput, Checkbox, FormControlLabel } from '@mui/material';
+import { Alert, FormControl, FormHelperText, Grid, InputLabel, OutlinedInput, Checkbox, FormControlLabel, Box, Typography, Paper, Popover } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Box } from '@mui/system';
 import { Formik } from 'formik';
 import jwt from 'jwtservice/jwtService';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import SimpleButton from 'ui-component/SimpleButton';
+import { HexColorPicker } from 'react-colorful';
+
+// Reusable color picker component
+const ColorPickerField = ({ label, value, onChange }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (e) => setAnchorEl(e.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+    const open = Boolean(anchorEl);
+
+    return (
+        <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>{label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {/* Color preview box — click to open picker */}
+                <Box
+                    onClick={handleClick}
+                    sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 2,
+                        backgroundColor: value,
+                        border: '2px solid #e0e0e0',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        transition: 'transform 0.2s',
+                        '&:hover': { transform: 'scale(1.05)' }
+                    }}
+                />
+                {/* Hex input */}
+                <OutlinedInput
+                    size="small"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    sx={{ width: 140, fontFamily: 'monospace' }}
+                    inputProps={{ maxLength: 7 }}
+                />
+            </Box>
+
+            {/* Color picker popover */}
+            <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            >
+                <Paper sx={{ p: 2 }}>
+                    <HexColorPicker color={value} onChange={onChange} />
+                    <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1, fontFamily: 'monospace' }}>
+                        {value}
+                    </Typography>
+                </Paper>
+            </Popover>
+        </Box>
+    );
+};
 
 function AddOrganization() {
     const theme = useTheme();
@@ -20,8 +75,8 @@ function AddOrganization() {
         email: '',
         mobile: '',
         address: '',
-        subdomain: '',           //  NEW
-        primaryColor: '#1976d2',
+        subdomain: '',
+        primaryColor: '#f07911',
         secondaryColor: '#424242',
         features: {
             smsAlerts: true,
@@ -39,7 +94,7 @@ function AddOrganization() {
             mobile: '',
             cnic: '',
             address: '',
-           type: 'orgAdmin',
+            type: 'orgAdmin',
             share: 0
         }
     };
@@ -65,7 +120,7 @@ function AddOrganization() {
             <h3>Add Organization</h3>
             {isError && <Alert severity="error">{errorMessage}</Alert>}
             <Formik initialValues={initialValues} onSubmit={onSubmit}>
-                {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
+                {({ values, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                     <form onSubmit={handleSubmit}>
 
                         {/* Organization Info */}
@@ -95,8 +150,6 @@ function AddOrganization() {
                                     <OutlinedInput name="address" value={values.address} onChange={handleChange} onBlur={handleBlur} label="Address" />
                                 </FormControl>
                             </Grid>
-
-                            {/* ✅ NEW — Subdomain Field */}
                             <Grid item xs={12} md={6}>
                                 <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
                                     <InputLabel>Subdomain</InputLabel>
@@ -109,22 +162,25 @@ function AddOrganization() {
                                         inputProps={{ pattern: '[a-z0-9\\-]+' }}
                                     />
                                     <FormHelperText>
-                                        Sirf lowercase letters, numbers aur hyphen (-). Example: bahawalpur, multan-city
+                                        Lowercase letters, numbers and hyphen only. Example: bahawalpur, multan-city
                                     </FormHelperText>
                                 </FormControl>
                             </Grid>
 
+                            {/* Color Pickers */}
                             <Grid item xs={12} md={6}>
-                                <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-                                    <InputLabel>Primary Color</InputLabel>
-                                    <OutlinedInput name="primaryColor" value={values.primaryColor} onChange={handleChange} onBlur={handleBlur} label="Primary Color" />
-                                </FormControl>
+                                <ColorPickerField
+                                    label="Primary Color"
+                                    value={values.primaryColor}
+                                    onChange={(color) => setFieldValue('primaryColor', color)}
+                                />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-                                    <InputLabel>Secondary Color</InputLabel>
-                                    <OutlinedInput name="secondaryColor" value={values.secondaryColor} onChange={handleChange} onBlur={handleBlur} label="Secondary Color" />
-                                </FormControl>
+                                <ColorPickerField
+                                    label="Secondary Color"
+                                    value={values.secondaryColor}
+                                    onChange={(color) => setFieldValue('secondaryColor', color)}
+                                />
                             </Grid>
                         </Grid>
 

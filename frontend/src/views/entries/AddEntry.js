@@ -19,7 +19,8 @@ import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useReactToPrint } from 'react-to-print';
 import SimpleButton from 'ui-component/SimpleButton';
-import { PAYMENT_METHODS, THEME_COLOR_DARK } from 'utils/Constants';
+import { PAYMENT_METHODS } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { CreateEntryValidationSchema } from '../../utils/ValidationSchemas';
 import ModalReceipt from './ModalReceipt';
 import Receipt from './Receipt';
@@ -33,11 +34,11 @@ function AddEntry() {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [colorBg, setColorBg] = useState(THEME_COLOR_DARK);
     const [openModal, setOpenModal] = useState(false);
     const [data, setData] = useState({});
     const [autoCompletedUsers, setAutoCompletedUsers] = useState([]);
 
+    const { primaryColor } = useOrgTheme();
     const startDateRef = useRef(null);
 
     const navigate = useNavigate();
@@ -149,7 +150,6 @@ function AddEntry() {
         jwt.getAllPackages(isp)
             .then((res) => {
                 setPackages(res?.data);
-                setColorBg(res?.data[0]?.isp?.color);
                 setIsLoading(false);
                 setIsError(false);
             })
@@ -484,7 +484,7 @@ function AddEntry() {
                         </label>
                         <Box sx={{ mt: 2 }}>
                             <Grid sx={{ width: '100%' }}>
-                                <SimpleButton isValid={!isValid} title="Add Entry" color={colorBg} />
+                               <SimpleButton isValid={!isValid} title="Add Entry" color={primaryColor} />
                             </Grid>
                         </Box>
                         <ModalReceipt

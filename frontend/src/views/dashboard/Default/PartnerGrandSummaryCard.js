@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
@@ -8,14 +7,15 @@ import { Box, Grid, Typography } from '@mui/material';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonIspGrandSummaryCard from 'ui-component/cards/Skeleton/IspGrandSummaryCard';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 
-// ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
+// ===========================|| DASHBOARD DEFAULT - PARTNER SUMMARY CARD ||=========================== //
 
 const PartnerGrandSummaryCard = ({ isLoading, data, companyIncome }) => {
-    console.log(data);
-    const partnerProfit = +(data?.share /100) * +companyIncome;
-    const partnerExpense = +data?.expense
+    const { primaryColor } = useOrgTheme();
+
+    const partnerProfit = +(data?.share / 100) * +companyIncome;
+    const partnerExpense = +data?.expense;
 
     const cardItem = { zIndex: 10 };
     const numberStyle = { fontSize: 24, fontWeight: 'bold' };
@@ -25,14 +25,11 @@ const PartnerGrandSummaryCard = ({ isLoading, data, companyIncome }) => {
     const textStyleRemaining = { fontSize: 22, color: 'red' };
 
     const CardWrapper = styled(MainCard)(({ theme }) => ({
-        backgroundColor: THEME_COLOR_LIGHT,
-        // backgroundColor: 'black',
+        backgroundColor: primaryColor,
         color: '#fff',
         overflow: 'hidden',
         position: 'relative',
-        myItem: {
-            zIndex: 999
-        },
+        myItem: { zIndex: 999 },
         '&:after': {
             content: '""',
             position: 'absolute',

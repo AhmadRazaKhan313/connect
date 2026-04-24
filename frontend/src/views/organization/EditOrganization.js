@@ -1,11 +1,66 @@
-import { Alert, FormControl, FormHelperText, Grid, InputLabel, OutlinedInput, Checkbox, FormControlLabel, Switch } from '@mui/material';
+import { Alert, FormControl, FormHelperText, Grid, InputLabel, OutlinedInput, Checkbox, FormControlLabel, Switch, Box, Typography, Paper, Popover } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Box } from '@mui/system';
 import { Formik } from 'formik';
 import jwt from 'jwtservice/jwtService';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import SimpleButton from 'ui-component/SimpleButton';
+import { HexColorPicker } from 'react-colorful';
+
+// Reusable color picker component
+const ColorPickerField = ({ label, value, onChange }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (e) => setAnchorEl(e.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+    const open = Boolean(anchorEl);
+
+    return (
+        <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>{label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {/* Color preview box — click to open picker */}
+                <Box
+                    onClick={handleClick}
+                    sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 2,
+                        backgroundColor: value,
+                        border: '2px solid #e0e0e0',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        transition: 'transform 0.2s',
+                        '&:hover': { transform: 'scale(1.05)' }
+                    }}
+                />
+                {/* Hex input */}
+                <OutlinedInput
+                    size="small"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    sx={{ width: 140, fontFamily: 'monospace' }}
+                    inputProps={{ maxLength: 7 }}
+                />
+            </Box>
+
+            {/* Color picker popover */}
+            <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            >
+                <Paper sx={{ p: 2 }}>
+                    <HexColorPicker color={value} onChange={onChange} />
+                    <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1, fontFamily: 'monospace' }}>
+                        {value}
+                    </Typography>
+                </Paper>
+            </Popover>
+        </Box>
+    );
+};
 
 function EditOrganization() {
     const theme = useTheme();
@@ -16,10 +71,8 @@ function EditOrganization() {
     const [isFetching, setIsFetching] = useState(true);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-
     const [initialValues, setInitialValues] = useState(null);
 
-    // ─── Existing org data  ───────────────────────────────────────────
     useEffect(() => {
         jwt.getOrganization(id)
             .then((res) => {
@@ -30,7 +83,7 @@ function EditOrganization() {
                     mobile:         org.mobile         || '',
                     address:        org.address        || '',
                     subdomain:      org.subdomain      || '',
-                    primaryColor:   org.primaryColor   || '#1976d2',
+                    primaryColor:   org.primaryColor   || '#f07911',
                     secondaryColor: org.secondaryColor || '#424242',
                     status:         org.status         || 'active',
                     features: {
@@ -46,19 +99,16 @@ function EditOrganization() {
                 setIsFetching(false);
             })
             .catch((err) => {
-                setErrorMessage(err?.response?.data?.message || 'Organization load nahi hui');
+                setErrorMessage(err?.response?.data?.message || 'Organization load failed');
                 setIsError(true);
                 setIsFetching(false);
             });
     }, [id]);
 
-    // ─── Submit: PUT (org info) + PATCH (features) ─────────────────────────────
     const onSubmit = (values, { resetForm }) => {
         setIsLoading(true);
-
         const { features, ...orgData } = values;
 
-    
         jwt.updateOrganization(id, orgData)
             .then(() => jwt.updateOrganizationFeatures(id, features))
             .then(() => {
@@ -73,7 +123,6 @@ function EditOrganization() {
             });
     };
 
-    // ─── Loading state ──────────────────────────────────────────────────────────
     if (isFetching) return <h3>Loading...</h3>;
     if (isError && !initialValues) return <Alert severity="error">{errorMessage}</Alert>;
 
@@ -86,7 +135,7 @@ function EditOrganization() {
                 {({ values, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                     <form onSubmit={handleSubmit}>
 
-                        {/* ── Organization Info ─────────────────────────────── */}
+                        {/* Organization Info */}
                         <h4>Organization Details</h4>
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={6}>
@@ -127,22 +176,8 @@ function EditOrganization() {
                                         inputProps={{ pattern: '[a-z0-9-]+' }}
                                     />
                                     <FormHelperText>
-                                        Sirf lowercase letters, numbers aur hyphen (-). Example: bahawalpur, multan-city
+                                        Lowercase letters, numbers and hyphen only. Example: bahawalpur, multan-city
                                     </FormHelperText>
-                                </FormControl>
-                            </Grid>
-
-                            {/* Colors */}
-                            <Grid item xs={12} md={6}>
-                                <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-                                    <InputLabel>Primary Color</InputLabel>
-                                    <OutlinedInput name="primaryColor" value={values.primaryColor} onChange={handleChange} onBlur={handleBlur} label="Primary Color" />
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-                                    <InputLabel>Secondary Color</InputLabel>
-                                    <OutlinedInput name="secondaryColor" value={values.secondaryColor} onChange={handleChange} onBlur={handleBlur} label="Secondary Color" />
                                 </FormControl>
                             </Grid>
 
@@ -159,9 +194,25 @@ function EditOrganization() {
                                     label={`Status: ${values.status === 'active' ? 'Active' : 'Inactive'}`}
                                 />
                             </Grid>
+
+                            {/* Color Pickers */}
+                            <Grid item xs={12} md={6}>
+                                <ColorPickerField
+                                    label="Primary Color"
+                                    value={values.primaryColor}
+                                    onChange={(color) => setFieldValue('primaryColor', color)}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <ColorPickerField
+                                    label="Secondary Color"
+                                    value={values.secondaryColor}
+                                    onChange={(color) => setFieldValue('secondaryColor', color)}
+                                />
+                            </Grid>
                         </Grid>
 
-                        {/* ── Feature Flags ─────────────────────────────────── */}
+                        {/* Feature Flags */}
                         <h4>Features</h4>
                         <Grid container spacing={1}>
                             {Object.keys(values.features).map((feature) => (

@@ -7,11 +7,12 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { Alert, Button } from '@mui/material';
-import { STAFF_TYPES, THEME_COLOR_LIGHT } from 'utils/Constants';
+import { STAFF_TYPES } from 'utils/Constants';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt from 'jwtservice/jwtService';
 import useAppContext from 'context/useAppContext';
+import useOrgTheme from 'utils/useOrgTheme';
 
 function createData(fullname, type, share, email, cnic, mobile, address) {
     return { fullname, type, share, email, cnic, mobile, address };
@@ -27,7 +28,7 @@ export default function AllStaff() {
 
     const { data, setData, filteredData, setFilteredData, setFilters } = useAppContext();
 
-    const style = { backgroundColor: THEME_COLOR_LIGHT, color: 'white' };
+    const { tableHeaderStyle: style } = useOrgTheme();
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);

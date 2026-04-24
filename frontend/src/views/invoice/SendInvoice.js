@@ -7,7 +7,8 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import SimpleButton from 'ui-component/SimpleButton';
-import { PAYMENT_METHODS, THEME_COLOR_DARK } from 'utils/Constants';
+import { PAYMENT_METHODS } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 
 import { SendInvoiceValidationSchema } from '../../utils/ValidationSchemas';
 
@@ -18,7 +19,8 @@ function SendInvoice() {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [colorBg, setColorBg] = useState(THEME_COLOR_DARK);
+    const { primaryColor } = useOrgTheme();
+    const [colorBg, setColorBg] = useState(primaryColor);
 
     const navigate = useNavigate();
 
@@ -116,7 +118,7 @@ function SendInvoice() {
                                         sx={{ paddingTop: '15px' }}
                                     >
                                         {isps.map((isp) => (
-                                            <MenuItem value={isp.id}>{isp.name}</MenuItem>
+                                            <MenuItem key={isp.id} value={isp.id}>{isp.name}</MenuItem>
                                         ))}
                                     </Select>
                                     {errors.isp && (
@@ -163,7 +165,7 @@ function SendInvoice() {
                                         sx={{ paddingTop: '15px' }}
                                     >
                                         {PAYMENT_METHODS.map(
-                                            (item) => item.key !== 'pending' && <MenuItem value={item.key}>{item.value}</MenuItem>
+                                            (item) => item.key !== 'pending' &&  <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
                                         )}
                                     </Select>
                                     {errors.paymentMethod && (

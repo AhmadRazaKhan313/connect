@@ -9,7 +9,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import jwt from 'jwtservice/jwtService';
 import { useNavigate, useParams } from 'react-router';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import PERMISSIONS from 'utils/Permissions';
 import SimpleButton from 'ui-component/SimpleButton';
 
@@ -23,6 +23,7 @@ export default function EditRole() {
     const theme = useTheme();
     const navigate = useNavigate();
     const { id } = useParams();
+    const { primaryColor } = useOrgTheme();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
@@ -83,7 +84,7 @@ export default function EditRole() {
                         .then(() => {
                             setIsLoading(false);
                             alert('Role updated successfully!');
-                            navigate('/roles');
+                            navigate('/dashboard/all-roles');
                         })
                         .catch((err) => {
                             setIsLoading(false);
@@ -136,7 +137,7 @@ export default function EditRole() {
                                                     checked={allSelected}
                                                     indeterminate={someSelected && !allSelected}
                                                     onChange={(e) => handleGroupSelectAll(group, e.target.checked, setFieldValue, values)}
-                                                    sx={{ color: THEME_COLOR_LIGHT, '&.Mui-checked': { color: THEME_COLOR_LIGHT } }}
+                                                    sx={{ color: primaryColor, '&.Mui-checked': { color: primaryColor } }}
                                                 />
                                                 <Typography fontWeight="bold" variant="subtitle1">
                                                     {group}
@@ -158,7 +159,7 @@ export default function EditRole() {
                                                                     setFieldValue('permissions', values.permissions.filter((p) => p !== perm.key));
                                                                 }
                                                             }}
-                                                            sx={{ color: THEME_COLOR_LIGHT, '&.Mui-checked': { color: THEME_COLOR_LIGHT } }}
+                                                            sx={{ color: primaryColor, '&.Mui-checked': { color: primaryColor } }}
                                                         />
                                                     }
                                                     label={perm.label}
@@ -179,7 +180,7 @@ export default function EditRole() {
                             />
                             <Button
                                 variant="outlined"
-                                onClick={() => navigate('/roles')}
+                                onClick={() => navigate('/dashboard/all-roles')}
                             >
                                 Cancel
                             </Button>

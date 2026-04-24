@@ -1,8 +1,11 @@
 import { Button } from '@mui/material';
-import { THEME_COLOR_DARK } from 'utils/Constants';
 import AnimateButton from './extended/AnimateButton';
+import useOrgTheme from 'utils/useOrgTheme';
 
-function SimpleButton({ isValid, title, color = THEME_COLOR_DARK }) {
+function SimpleButton({ isValid, title, color }) {
+    const { primaryColor } = useOrgTheme();
+    const btnColor = color || primaryColor;
+
     return (
         <AnimateButton>
             <Button
@@ -12,7 +15,7 @@ function SimpleButton({ isValid, title, color = THEME_COLOR_DARK }) {
                 size="large"
                 type="submit"
                 variant="contained"
-                style={{ backgroundColor: color, color: 'white' }}
+                style={{ backgroundColor: btnColor, color: 'white' }}
             >
                 {title}
             </Button>

@@ -7,8 +7,6 @@ import {
   Box,
   Button,
   ButtonBase,
-  FormLabel,
-  Switch,
   Typography,
 } from "@mui/material";
 
@@ -21,18 +19,17 @@ import ProfileSection from "./ProfileSection";
 import { IconMenu2 } from "@tabler/icons";
 import useAppContext from "context/useAppContext";
 import CustomMessageModal from "./CustomMessageModal";
-import { useState } from "react";
-import { Label } from "@mui/icons-material";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import jwt from "jwtservice/jwtService";
-import { STAFF_TYPES, THEME_COLOR_DARK } from "utils/Constants";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import useOrgTheme from "utils/useOrgTheme";
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
 const Header = ({ handleLeftDrawerToggle }) => {
   const theme = useTheme();
+  const { primaryColor } = useOrgTheme();
 
   const { filters, data, setFilteredData, smsBalance, getSmsBalance } =
     useAppContext();
@@ -41,53 +38,29 @@ const Header = ({ handleLeftDrawerToggle }) => {
   const [smsSwitch, setSmsSwitch] = useState(true);
 
   useEffect(() => {
-    // eslint-disable-next-line
     jwt
       .getSmsSending()
-      // eslint-disable-next-line
       .then((res) => {
         setSmsSwitch(res?.data?.smsSending);
       })
-      // eslint-disable-next-line
       .catch((err) => {});
   }, []);
 
-  // useEffect(() => {
-  //     // eslint-disable-next-line
-  //     jwt.updateSmsSending({ smsSending: smsSwitch })
-  //         // eslint-disable-next-line
-  //         .then((res) => { })
-  //         // eslint-disable-next-line
-  //         .catch((err) => { });
-  // }, [smsSwitch]);
-
-  const handleChange = (event) => {
-    setSmsSwitch(event.target.checked);
-  };
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   const sendExpiryAlert = () => {
     jwt
       .sendExpiryAlert()
-      // eslint-disable-next-line
       .then((res) => {
         alert("Expiry Alert Sent");
         getSmsBalance();
       })
-      // eslint-disable-next-line
       .catch((err) => toast.error(err));
   };
 
   return (
     <>
-      {/* logo & toggler button */}
       <Box
         sx={{
           width: 228,
@@ -133,29 +106,23 @@ const Header = ({ handleLeftDrawerToggle }) => {
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ flexGrow: 1 }} />
       <div style={{ display: "flex" }}>
-        <Typography sx={{ mr: 0.5, color: THEME_COLOR_DARK }}>
+        <Typography sx={{ mr: 0.5, color: primaryColor }}>
           SMS Balance:{" "}
         </Typography>
         <Typography sx={{ mr: 1, color: smsBalance < 100 ? "red" : "green" }}>
           {smsBalance}
         </Typography>
       </div>
-      {/* {jwt.getUser()?.type === STAFF_TYPES.admin && (
-                <>
-                    <FormLabel>SMS Sending</FormLabel>
-                    <Switch checked={smsSwitch} onChange={handleChange} name="checked" inputProps={{ 'aria-label': 'controlled' }} />
-                </>
-            )} */}
       <Button
         variant="contained"
-        sx={{ mr: 2, color: "white" }}
+        sx={{ mr: 2, color: "white", backgroundColor: primaryColor }}
         onClick={handleOpenModal}
       >
         Send Message
       </Button>
       <Button
         variant="contained"
-        sx={{ mr: 2, color: "white" }}
+        sx={{ mr: 2, color: "white", backgroundColor: primaryColor }}
         onClick={sendExpiryAlert}
       >
         Expiry Alert Message

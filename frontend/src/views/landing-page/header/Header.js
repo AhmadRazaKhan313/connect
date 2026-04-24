@@ -1,10 +1,12 @@
 import { Button } from '@mui/material';
 import React from 'react';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import BG_IMAGE from '../../../assets/images/bg-header.jpg';
 import './header.css';
 
 function Header() {
+    const { primaryColor } = useOrgTheme();
+
     return (
         <div className="container">
             <img src={BG_IMAGE} alt="Header" style={{ width: '100%' }} />
@@ -19,7 +21,7 @@ function Header() {
                     choose from wide range of available speeds.
                 </p>
                 <p style={{ textAlign: 'left' }}>
-                    <Button variant="contained" className="button" sx={{ color: 'white', backgroundColor: THEME_COLOR_LIGHT }}>
+                    <Button variant="contained" className="button" sx={{ color: 'white', backgroundColor: primaryColor }}>
                         Explore Us
                     </Button>
                 </p>

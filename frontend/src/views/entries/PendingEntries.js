@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { Alert, Button, Grid, MenuItem, Select } from '@mui/material';
-import { THEME_COLOR_DARK } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt from 'jwtservice/jwtService';
@@ -38,7 +38,7 @@ export default function PendingEntries() {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, index) => startYear + index);
 
-    const style = { backgroundColor: THEME_COLOR_DARK, color: 'white' };
+  const { tableHeaderStyle: style, primaryColor } = useOrgTheme();
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -196,7 +196,7 @@ export default function PendingEntries() {
                             size="large"
                             variant="contained"
                             onClick={getEntry}
-                            style={{ backgroundColor: THEME_COLOR_DARK, color: 'white', height: '55px', borderRadius: '10px' }}
+                            style={{ backgroundColor: primaryColor, color: 'white', height: '55px', borderRadius: '10px' }}
                         >
                             All Pending Entries
                         </Button>

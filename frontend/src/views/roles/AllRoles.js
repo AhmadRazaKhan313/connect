@@ -3,7 +3,7 @@ import {
     Paper, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Button, Alert, Chip, Box, Typography
 } from '@mui/material';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import jwt from 'jwtservice/jwtService';
 import { useNavigate } from 'react-router';
 
@@ -15,9 +15,7 @@ export default function AllRoles() {
     const [errorMessage, setErrorMessage] = useState('');
 
     const currentUser = jwt.getUser();
-const isOwnRole = currentUser?.roleId === role.id;
-
-    const style = { backgroundColor: THEME_COLOR_LIGHT, color: 'white' };
+    const { tableHeaderStyle: style, primaryColor } = useOrgTheme();
 
     useEffect(() => {
         loadRoles();
@@ -41,7 +39,7 @@ const isOwnRole = currentUser?.roleId === role.id;
         if (window.confirm('Are you sure you want to delete this role?')) {
             jwt.deleteRole(id)
                 .then(() => {
-                    setRoles((prev) => prev.filter((r) => r.id !== id));
+                    setRoles((prev) => prev.filter((r) => r._id !== id));
                 })
                 .catch((err) => alert(err?.response?.data?.message));
         }
@@ -53,7 +51,7 @@ const isOwnRole = currentUser?.roleId === role.id;
                 <Typography variant="h3">All Roles</Typography>
                 <Button
                     variant="contained"
-                    sx={{ backgroundColor: THEME_COLOR_LIGHT }}
+                    sx={{ backgroundColor: primaryColor }}
                     onClick={() => navigate('/dashboard/add-role')}
                 >
                     + Add Role
@@ -74,40 +72,50 @@ const isOwnRole = currentUser?.roleId === role.id;
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {roles.map((role, index) => (
-                            <TableRow key={role.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>
-                                    <Typography fontWeight="bold">{role.name}</Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {role.permissions?.map((p) => (
-                                            <Chip
-                                                key={p}
-                                                label={p}
+                        {roles.map((role, index) => {
+                            const isOwnRole = currentUser?.roleId === role._id;
+                            return (
+                                <TableRow key={role._id}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>
+                                        <Typography fontWeight="bold">{role.name}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {role.permissions?.map((p) => (
+                                                <Chip
+                                                    key={p}
+                                                    label={p}
+                                                    size="small"
+                                                    color="primary"
+                                                    variant="outlined"
+                                                />
+                                            ))}
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ mr: 1 }}
+                                            onClick={() => navigate(`/dashboard/edit-role/${role._id}`)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        {!isOwnRole && (
+                                            <Button
                                                 size="small"
-                                                color="primary"
                                                 variant="outlined"
-                                            />
-                                        ))}
-                                    </Box>
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ mr: 1 }}
-                                        onClick={() => navigate(`/dashboard/edit-role/${role.id}`)}
-                                    >
-                                        Edit
-                                    </Button>
-                                   {!isOwnRole && (
-                                    <Button onClick={() => handleDelete(role.id)}>Delete</Button>
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                                color="error"
+                                                onClick={() => handleDelete(role._id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                         {!isLoading && roles.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={4} align="center">

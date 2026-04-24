@@ -8,7 +8,8 @@ import { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useReactToPrint } from 'react-to-print';
 import SimpleButton from 'ui-component/SimpleButton';
-import { PAYMENT_METHODS, THEME_COLOR_DARK } from 'utils/Constants';
+import { PAYMENT_METHODS } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { CreateEntryValidationSchema } from '../../utils/ValidationSchemas';
 import ModalReceipt from './ModalReceipt';
 import Receipt from './Receipt';
@@ -25,9 +26,10 @@ function EditEntry() {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [colorBg, setColorBg] = useState(THEME_COLOR_DARK);
     const [openModal, setOpenModal] = useState(false);
     const [data, setData] = useState({});
+
+    const { primaryColor } = useOrgTheme();
 
     const handleCloseModal = () => {
         setOpenModal(false);

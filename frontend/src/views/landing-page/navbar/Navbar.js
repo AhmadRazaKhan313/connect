@@ -10,13 +10,14 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from '../../../assets/images/logo-white-navbar.svg';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import useOrgTheme from 'utils/useOrgTheme';
 
 function Navbar({ pages, selectedMenu, setSelectedMenu }) {
     const [anchorElNav, setAnchorElNav] = useState(null);
     const navigate = useNavigate();
+    const { primaryColor } = useOrgTheme();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -75,7 +76,7 @@ function Navbar({ pages, selectedMenu, setSelectedMenu }) {
                             <Button
                                 key={page.key}
                                 onClick={() => handleCloseNavMenu(page.key)}
-                                sx={{ mr: 2, my: 5, color: selectedMenu === page.key ? THEME_COLOR_LIGHT : 'white', display: 'block' }}
+                                sx={{ mr: 2, my: 5, color: selectedMenu === page.key ? primaryColor : 'white', display: 'block' }}
                             >
                                 {page.value}
                             </Button>
@@ -85,7 +86,7 @@ function Navbar({ pages, selectedMenu, setSelectedMenu }) {
                     <Box sx={{ flexGrow: 0 }}>
                         <Button
                             variant="contained"
-                            sx={{ color: 'white', backgroundColor: THEME_COLOR_LIGHT }}
+                            sx={{ color: 'white', backgroundColor: primaryColor }}
                             onClick={() => navigate('/login')}
                         >
                             LOGIN

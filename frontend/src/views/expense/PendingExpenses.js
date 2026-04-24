@@ -7,7 +7,8 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { Alert, Button, FormControl, Grid, InputLabel, OutlinedInput } from '@mui/material';
-import { STAFF_TYPES, THEME_COLOR_DARK } from 'utils/Constants';
+import { STAFF_TYPES } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt from 'jwtservice/jwtService';
@@ -40,7 +41,7 @@ export default function PendingExpenses() {
 
     const { data, setData, filteredData, setFilteredData, setFilters } = useAppContext();
 
-    const style = { backgroundColor: THEME_COLOR_DARK, color: 'white' };
+    const { tableHeaderStyle: style } = useOrgTheme();
 
     useEffect(() => {
         setTimeout(() => {

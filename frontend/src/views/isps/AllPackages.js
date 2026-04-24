@@ -6,12 +6,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { STAFF_TYPES, THEME_COLOR_DARK, THEME_COLOR_LIGHT } from '../../utils/Constants';
+import { STAFF_TYPES } from '../../utils/Constants';
 import { useLocation, useNavigate } from 'react-router';
 import { Alert, Button } from '@mui/material';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt from 'jwtservice/jwtService';
+import useOrgTheme from 'utils/useOrgTheme';
 
 function createData(id, ispId, color, name, bandwidth, rateType, ratePerDay, purchaseRate, saleRate, validity) {
     return { id, ispId, color, name, bandwidth, rateType, ratePerDay, purchaseRate, saleRate, validity };
@@ -28,9 +29,10 @@ export default function AllPackages() {
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const style = { backgroundColor: THEME_COLOR_LIGHT, color: 'white' };
+    const { tableHeaderStyle: style } = useOrgTheme();
 
-    const { ispId = '', color = THEME_COLOR_DARK } = useLocation().state;
+    const { primaryColor } = useOrgTheme();
+    const { ispId = '', color = primaryColor } = useLocation().state;
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };

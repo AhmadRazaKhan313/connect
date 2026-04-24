@@ -175,8 +175,8 @@ function CompletePayment() {
                                             sx={{ paddingTop: '15px' }}
                                             disabled
                                         >
-                                            {isps.map((isp) => (
-                                                <MenuItem value={isp.id}>{isp.name}</MenuItem>
+                                           {isps.map((isp) => (
+                                            <MenuItem key={isp.id} value={isp.id}>{isp.name}</MenuItem>
                                             ))}
                                         </Select>
                                         {errors.isp && (
@@ -224,7 +224,7 @@ function CompletePayment() {
                                             disabled
                                         >
                                             {packages.map((item) => (
-                                                <MenuItem value={item.id}>{item.name}</MenuItem>
+                                            <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
                                             ))}
                                         </Select>
                                         {errors.package && (
@@ -249,8 +249,8 @@ function CompletePayment() {
                                             label="Select Payment Method"
                                             sx={{ paddingTop: '15px' }}
                                         >
-                                            {PAYMENT_METHODS.map((item) => (
-                                                <MenuItem value={item.key}>{item.value}</MenuItem>
+                                           {PAYMENT_METHODS.map((item) => (
+                                            <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
                                             ))}
                                         </Select>
                                         {errors.paymentMethod && (

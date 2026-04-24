@@ -6,7 +6,8 @@ import jwt from 'jwtservice/jwtService';
 import moment from 'moment';
 import { useState } from 'react';
 import SimpleButton from 'ui-component/SimpleButton';
-import { PAYMENT_METHODS, THEME_COLOR_DARK } from 'utils/Constants';
+import { PAYMENT_METHODS } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { CreateExtraIncomeValidationSchema } from '../../utils/ValidationSchemas';
 
 const AddExtraIncome = () => {
@@ -15,7 +16,8 @@ const AddExtraIncome = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [colorBg, setColorBg] = useState(THEME_COLOR_DARK);
+   
+    const { primaryColor } = useOrgTheme();
 
     let initialValues = {
         date: '',
@@ -171,8 +173,8 @@ const AddExtraIncome = () => {
                                         label="Select Payment Method"
                                         sx={{ paddingTop: '15px' }}
                                     >
-                                        {PAYMENT_METHODS.map((item) => (
-                                            <MenuItem value={item.key}>{item.value}</MenuItem>
+                                      {PAYMENT_METHODS.map((item) => (
+                                        <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
                                         ))}
                                     </Select>
                                     {errors.paymentMethod && (
@@ -230,7 +232,7 @@ const AddExtraIncome = () => {
                         </Grid>
                         <Box sx={{ mt: 2 }}>
                             <Grid sx={{ width: '100%' }}>
-                                <SimpleButton isValid={!isValid} title="Add Extra Income" color={colorBg} />
+                               <SimpleButton isValid={!isValid} title="Add Extra Income" color={primaryColor} />
                             </Grid>
                         </Box>
                     </form>

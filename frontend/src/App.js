@@ -1,25 +1,18 @@
 import { useSelector } from 'react-redux';
-
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
-
-// routing
 import Routes from 'routes';
-
-// defaultTheme
 import themes from 'themes';
-
-// project imports
 import NavigationScroll from 'layout/NavigationScroll';
-
-// ==============================|| APP ||============================== //
+import useAppContext from 'context/useAppContext';
 
 const App = () => {
     const customization = useSelector((state) => state.customization);
+    const { orgColors } = useAppContext();
 
     return (
         <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={themes(customization)}>
+            <ThemeProvider theme={themes(customization, orgColors)}>
                 <CssBaseline />
                 <NavigationScroll>
                     <Routes />

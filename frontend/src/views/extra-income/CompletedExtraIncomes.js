@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { Alert, Button, FormControl, Grid, InputLabel, OutlinedInput } from '@mui/material';
-import { THEME_COLOR_LIGHT } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt from 'jwtservice/jwtService';
@@ -29,7 +29,7 @@ export default function CompletedExtraIncomes() {
     const [startDate, setStartDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [total, setTotal] = useState(0);
-    const [colorBg, setColorBg] = useState(THEME_COLOR_LIGHT);
+    const { primaryColor: colorBg, tableHeaderStyle: style } = useOrgTheme();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
@@ -37,7 +37,7 @@ export default function CompletedExtraIncomes() {
 
     const { data, setData, filteredData, setFilteredData, setFilters } = useAppContext();
 
-    const style = { backgroundColor: colorBg, color: 'white' };
+    
     const navigate = useNavigate();
 
     useEffect(() => {

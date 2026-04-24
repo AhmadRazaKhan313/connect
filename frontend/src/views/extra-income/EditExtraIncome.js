@@ -6,7 +6,8 @@ import jwt from 'jwtservice/jwtService';
 import moment from 'moment';
 import { useState } from 'react';
 import SimpleButton from 'ui-component/SimpleButton';
-import { PAYMENT_METHODS, THEME_COLOR_DARK } from 'utils/Constants';
+import { PAYMENT_METHODS } from 'utils/Constants';
+import useOrgTheme from 'utils/useOrgTheme';
 import { CreateExtraIncomeValidationSchema } from '../../utils/ValidationSchemas';
 import { useLocation, useNavigate } from 'react-router';
 import { useEffect } from 'react';
@@ -23,8 +24,9 @@ const AddExtraIncome = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [colorBg, setColorBg] = useState(THEME_COLOR_DARK);
     const [extraIncomeId, setExtraIncomeId] = useState('');
+    const { primaryColor } = useOrgTheme();
+    
 
     useEffect(() => {
         setExtraIncomeId(data?.id || data?._id);
@@ -187,7 +189,7 @@ const AddExtraIncome = () => {
                                         sx={{ paddingTop: '15px' }}
                                     >
                                         {PAYMENT_METHODS.map((item) => (
-                                            <MenuItem value={item.key}>{item.value}</MenuItem>
+                                             <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
                                         ))}
                                     </Select>
                                     {errors.paymentMethod && (

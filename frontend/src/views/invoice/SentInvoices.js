@@ -7,10 +7,11 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { Alert, Button, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material';
-import { STAFF_TYPES, THEME_COLOR_LIGHT } from 'utils/Constants';
+import { STAFF_TYPES } from 'utils/Constants';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt from 'jwtservice/jwtService';
+import useOrgTheme from 'utils/useOrgTheme';
 import moment from 'moment';
 import { getPaymentMethodNameByKey } from 'utils/Functions';
 import TotalIncomeDarkCard from 'views/dashboard/Default/TotalIncomeDarkCard';
@@ -29,7 +30,7 @@ export default function SentInvoices() {
     const [startDate, setStartDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [total, setTotal] = useState(0);
-    const [colorBg, setColorBg] = useState(THEME_COLOR_LIGHT);
+    const { primaryColor: colorBg, tableHeaderStyle: style } = useOrgTheme();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
@@ -37,7 +38,7 @@ export default function SentInvoices() {
 
     const { data, setData, filteredData, setFilteredData, setFilters } = useAppContext();
 
-    const style = { backgroundColor: colorBg, color: 'white' };
+    
 
     useEffect(() => {
         setFilters(['isp', 'date', 'amount', 'paymentMethod', 'tid', 'comments']);
